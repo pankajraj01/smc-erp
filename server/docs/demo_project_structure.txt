@@ -1,0 +1,52 @@
+/shree-mega-erp
+│
+├── /src
+│   ├── /config               # DB and App configurations (env, DB connect)
+│   ├── /routes               # All route files
+│   │   ├── master.routes.js
+│   │   ├── grey.routes.js
+│   │   └── neft.routes.js
+│   │
+│   ├── /controllers          # Logic for route handling
+│   │   ├── master/
+│   │   │   ├── itemController.js
+│   │   │   ├── partyController.js
+│   │   │   ├── agentController.js
+│   │   │   └── ...
+│   │   ├── grey/
+│   │   │   ├── greyOrderController.js
+│   │   │   └── greyReceiveController.js
+│   │   └── neft/
+│   │       └── neftController.js
+│   │
+│   ├── /models               # Mongoose models (schema)
+│   │   ├── master/
+│   │   │   ├── item.model.js
+│   │   │   ├── party.model.js
+│   │   │   ├── agent.model.js
+│   │   │   └── ...
+│   │   ├── grey/
+│   │   │   ├── greyOrder.model.js
+│   │   │   └── greyReceive.model.js
+│   │   └── neft/
+│   │       └── neft.model.js
+│   │
+│   ├── /services             # Business logic, calculations, db aggregations
+│   │   └── neft.service.js
+│   │
+│   ├── /middleware           # Auth, error handling, validation, etc.
+│   │   └── errorHandler.js
+│   │
+│   ├── /utils                # Utility functions (date parser, PDF, export to excel etc.)
+│   │   ├── fileHelper.js
+│   │   └── formatter.js
+│   │
+│   └── app.js                # Main Express app setup
+│
+├── /public                   # (Optional) Static files, logos
+├── /scripts                  # DB Seeder, Cron jobs, backups
+├── /docs                     # API Docs, Postman collections
+├── .env
+├── .gitignore
+├── package.json
+└── README.md

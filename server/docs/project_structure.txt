@@ -1,0 +1,20 @@
+--- Folder Structure ---
+app.js
+[controllers]
+    ├── item-controllers.js
+    └── users-controllers.js
+[docs]
+    └── .project_structure_ignore
+[middlewares]
+    └── check-auth.js
+[models]
+    ├── http-error.js
+    ├── item.js
+    └── user.js
+[node_modules]
+package-lock.json
+package.json
+[routes]
+    ├── item-routes.js
+    └── users-routes.js
+

@@ -1,0 +1,36 @@
+🛠️ ERP Backend Development Steps
+Step 1: Plan Modules
+
+List out features like Item, Party, Agent, Grey Order, NEFT, etc.
+
+Step 2: Create Mongoose Models
+
+Define schema for each module (structure of data)
+
+Step 3: Write Controller Functions
+
+Add logic to create, read, update, delete (CRUD) data
+
+Step 4: Define Express Routes
+
+Create routes and connect them to controllers
+
+Step 5: Connect Routes in app.js
+
+Import and register all routes
+
+Step 6: Add Middlewares
+
+For validation, auth, logging, error handling, 404
+
+Step 7: Test APIs using Postman
+
+Check all endpoints manually
+
+Step 8: Clean & Refactor
+
+Move repeated logic to middleware or services
+
+Step 9: Deploy Project
+
+Use MongoDB Atlas + Render / Railway / VPS + PM2
