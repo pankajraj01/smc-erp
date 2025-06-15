@@ -76,7 +76,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Party Master',
-    to: '/api/master/parties',
+    to: '/api/master/party',
     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
   },
 

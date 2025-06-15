@@ -1,4 +1,6 @@
+// 🌟 BEAUTIFUL CONFIRMATION MODAL — ConfirmationModal.jsx
 import {
+  CBadge,
   CButton,
   CCard,
   CCardBody,
@@ -16,8 +18,6 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-import { isPatternOrGradient } from 'chart.js/helpers'
-
 import { useNavigate } from 'react-router-dom'
 
 export default function ConfirmationModal({
@@ -32,169 +32,169 @@ export default function ConfirmationModal({
   remark,
 }) {
   const navigate = useNavigate()
+
   return (
     <CModal
       size="xl"
       visible={isVisible}
       backdrop="static"
       keyboard={false}
-      onClose={() => setIsVisible(!isVisible)}
+      onClose={() => setIsVisible(false)}
     >
-      <CModalHeader>
-        <CModalTitle>Confirmation</CModalTitle>
+      <CModalHeader className="bg-success text-white">
+        <CModalTitle>✅ Confirm NEFT Entry</CModalTitle>
       </CModalHeader>
       <CModalBody>
-        <CRow>
-          <CCol>
+        {/* Party & Bank Section */}
+        <CCard className="shadow-sm mb-4 border-start border-success border-4">
+          <CCardBody>
             <CRow>
-              <CCol xs={3} className="mb-3">
-                <p>Party Name :</p>
-              </CCol>
-              <CCol>
-                <h3>{formData.partyName}</h3>
-              </CCol>
-            </CRow>
-            <CContainer className="border border-dark rounded-3">
-              <CRow>
-                <CCol className="border">
-                  <CRow className="my-2">
+              <CCol md={8}>
+                <h5 className="text-muted">Party Name:</h5>
+                <h4 className="fw-bold text-success">{formData.partyName}</h4>
+
+                <CCard className="p-3 bg-light border">
+                  <CRow className="mb-2">
                     <CCol>
-                      <CRow>
-                        <CCol>
-                          <p>Bank Name :</p>
-                        </CCol>
-                        <CCol>
-                          <p>{formData.bankName}</p>
-                        </CCol>
-                      </CRow>
+                      <strong>Bank Name:</strong>
                     </CCol>
+                    <CCol>{formData.bankName}</CCol>
+                  </CRow>
+                  <CRow className="mb-2">
+                    <CCol>
+                      <strong>Account No:</strong>
+                    </CCol>
+                    <CCol>{formData.accountNo}</CCol>
                   </CRow>
                   <CRow>
                     <CCol>
-                      <CRow>
-                        <CCol>
-                          <p>Account No :</p>
-                        </CCol>
-                        <CCol>
-                          <p>{formData.accountNo}</p>
-                        </CCol>
-                      </CRow>
+                      <strong>IFSC Code:</strong>
                     </CCol>
+                    <CCol>{formData.ifscCode}</CCol>
                   </CRow>
-                  <CRow className="my-2">
+                </CCard>
+              </CCol>
+
+              <CCol
+                md={4}
+                className="bg-light rounded p-4 shadow-sm border-start border-success border-4 d-flex flex-column justify-content-between"
+              >
+                <CContainer>
+                  {/* NEFT No */}
+                  <CRow className="mb-3">
+                    <CCol xs="5">
+                      <small className="text-muted">NEFT No</small>
+                    </CCol>
                     <CCol>
-                      <CRow>
-                        <CCol>
-                          <p>IFSC Code :</p>
-                        </CCol>
-                        <CCol>
-                          <p>{formData.ifscCode}</p>
-                        </CCol>
-                      </CRow>
+                      <h4 className="fw-bold text-success mb-0">#{neftCNo}</h4>
                     </CCol>
                   </CRow>
-                </CCol>
-              </CRow>
-            </CContainer>
-          </CCol>
-          <CCol>
-            <CRow className=" m-2 align-items-center justify-content-end">
-              <CCol xs="auto">
-                <h3>Neft No. :</h3>
-              </CCol>
-              <CCol xs="auto">
-                <h1>{neftCNo}</h1>
+
+                  {/* NEFT Date */}
+                  <CRow className="mb-3">
+                    <CCol xs="5">
+                      <small className="text-muted">Date</small>
+                    </CCol>
+                    <CCol>
+                      <h6 className="fw-semibold text-dark mb-0">{neftDate}</h6>
+                    </CCol>
+                  </CRow>
+
+                  {/* NEFT Status */}
+                  <CRow>
+                    <CCol xs="5">
+                      <small className="text-muted">Status</small>
+                    </CCol>
+                    <CCol>
+                      <CBadge
+                        color={
+                          formData.neftStatus === 'Paid'
+                            ? 'success'
+                            : formData.neftStatus === 'Pending'
+                              ? 'warning'
+                              : formData.neftStatus === 'Partial'
+                                ? 'info'
+                                : 'secondary'
+                        }
+                        className="px-3 py-1"
+                      >
+                        {formData.neftStatus || 'Pending'}
+                      </CBadge>
+                    </CCol>
+                  </CRow>
+                </CContainer>
               </CCol>
             </CRow>
-            <CRow className=" m-2 align-items-center justify-content-end">
-              <CCol xs="auto">
-                <h3>Neft Date :</h3>
-              </CCol>
-              <CCol xs="auto">
-                <h3>{neftDate}</h3>
-              </CCol>
-            </CRow>
-          </CCol>
-        </CRow>
+          </CCardBody>
+        </CCard>
 
-        {/* Bills */}
-
-        <CRow className="mt-4">
-          <CTable bordered responsive>
-            <CTableHead>
-              <CTableRow className="text-center">
-                <CTableHeaderCell scope="col">Sr.</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Bill No.</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Bill Date</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Bill Amount</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Discount</CTableHeaderCell>
-                <CTableHeaderCell scope="col">RD</CTableHeaderCell>
-                <CTableHeaderCell scope="col">TDS</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Net Amount</CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody className="text-center">
-              {billRows.map((row, index) => (
-                <CTableRow key={index}>
-                  <CTableHeaderCell scope="row">{index + 1}</CTableHeaderCell>
-                  <CTableDataCell>
-                    <p>{row.billNo}</p>
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    <p>{row.date}</p>
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    <p>{row.amount}</p>
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    <p>{row.rd}</p>
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    <p>{row.discount}</p>
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    <p>{row.tds}</p>
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    <p>{row.finalAmount}</p>
-                  </CTableDataCell>
+        {/* Bill Details Table */}
+        <CCard className="shadow-sm mb-4 border-start border-info border-4">
+          <CCardBody>
+            <h6 className="text-info mb-3">Bill Breakdown</h6>
+            <CTable bordered responsive hover striped className="text-center">
+              <CTableHead color="light">
+                <CTableRow>
+                  <CTableHeaderCell>Sr.</CTableHeaderCell>
+                  <CTableHeaderCell>Bill No</CTableHeaderCell>
+                  <CTableHeaderCell>Date</CTableHeaderCell>
+                  <CTableHeaderCell>Amount</CTableHeaderCell>
+                  <CTableHeaderCell>Discount</CTableHeaderCell>
+                  <CTableHeaderCell>RD</CTableHeaderCell>
+                  <CTableHeaderCell>TDS</CTableHeaderCell>
+                  <CTableHeaderCell>Net</CTableHeaderCell>
                 </CTableRow>
-              ))}
-            </CTableBody>
-          </CTable>
-        </CRow>
-        <CRow>
-          <CCol xs={8}>
-            <p className="border h-100 d-inline-block w-100 p-2" rows={3} placeholder="Remark">
-              {remark}
-            </p>
-          </CCol>
-          <CCol color="info" className="me-2 bg-light">
-            <CRow className="d-flex justify-content-between align-items-center my-3">
-              <CCol className="text-start">
-                <h5>Tds Total :</h5>
+              </CTableHead>
+              <CTableBody>
+                {billRows.map((row, index) => (
+                  <CTableRow key={index}>
+                    <CTableDataCell>{index + 1}</CTableDataCell>
+                    <CTableDataCell>{row.billNo}</CTableDataCell>
+                    <CTableDataCell>{row.date}</CTableDataCell>
+                    <CTableDataCell>{row.amount}</CTableDataCell>
+                    <CTableDataCell>{row.discount}</CTableDataCell>
+                    <CTableDataCell>{row.rd}</CTableDataCell>
+                    <CTableDataCell>{row.tds}</CTableDataCell>
+                    <CTableDataCell>{row.finalAmount}</CTableDataCell>
+                  </CTableRow>
+                ))}
+              </CTableBody>
+            </CTable>
+          </CCardBody>
+        </CCard>
+
+        {/* Summary & Remark */}
+        <CCard className="mb-4 shadow-sm">
+          <CCardBody>
+            <CRow>
+              <CCol md={8}>
+                <h6 className="text-muted">Remark:</h6>
+                <p className="border p-3 bg-light rounded">{remark}</p>
               </CCol>
-              <CCol className="text-end">
-                <h5>&#8377;{totalTdsAmount}</h5>
+              <CCol>
+                <CCard className="bg-light p-3">
+                  <CRow className="mb-2">
+                    <CCol className="text-start">TDS Total:</CCol>
+                    <CCol className="text-end text-info fw-bold">₹ {totalTdsAmount}</CCol>
+                  </CRow>
+                  <CRow>
+                    <CCol className="text-start">Total Amount:</CCol>
+                    <CCol className="text-end text-success fw-bold fs-4">₹ {totalNetAmount}</CCol>
+                  </CRow>
+                </CCard>
               </CCol>
             </CRow>
-            <CRow className="d-flex justify-content-between align-items-center">
-              <CCol className="text-start">
-                <h5>Total Amount :</h5>
-              </CCol>
-              <CCol className="text-end">
-                <h2>&#8377;{totalNetAmount}</h2>
-              </CCol>
-            </CRow>
-          </CCol>
-        </CRow>
+          </CCardBody>
+        </CCard>
+
+        {/* Actions */}
         <CRow className="my-3">
           <CCol className="d-flex justify-content-end gap-2">
-            <CButton color="danger" onClick={() => setIsVisible(!isVisible)}>
+            <CButton color="danger" variant="outline" onClick={() => setIsVisible(false)}>
               Cancel
             </CButton>
             <CButton color="success" onClick={() => navigate('/neft-manager')}>
-              Save
+              ✅ Confirm & Save
             </CButton>
           </CCol>
         </CRow>

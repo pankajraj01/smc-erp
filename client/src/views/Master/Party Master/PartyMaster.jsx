@@ -30,7 +30,7 @@ export default function PartyMaster() {
   // function to Fetch parties
   const fetchParties = async (goToLastPage = false) => {
     try {
-      const res = await fetch('http://localhost:5000/api/master/parties')
+      const res = await fetch('http://localhost:5000/api/master/party')
       const data = await res.json()
       const allParties = data.parties || []
 

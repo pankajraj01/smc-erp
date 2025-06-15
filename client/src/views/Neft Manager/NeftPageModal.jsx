@@ -1,5 +1,9 @@
 import {
+  CBadge,
   CButton,
+  CCard,
+  CCardBody,
+  CCol,
   CContainer,
   CFormInput,
   CModal,
@@ -8,6 +12,7 @@ import {
   CModalTitle,
   CPagination,
   CPaginationItem,
+  CRow,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -15,61 +20,93 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-import neftData from '../../data/neftData'
-import { useState } from 'react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash } from '@coreui/icons'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import neftData from '../../data/neftData'
 
 export default function NeftPageModal({ isVisible, setIsVisible, selectedNeft }) {
   const [currentPage, setCurrentPage] = useState(1)
   const ITEMS_PER_PAGE = 5
   const totalPages = Math.ceil(neftData.length / ITEMS_PER_PAGE)
-  const paginatedData = neftData.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE,
-  )
+  const navigate = useNavigate()
+
   const filterdData = neftData.filter((neft) => neft.neftNo === selectedNeft)
-  const neftDate = filterdData[0].neftDate
+  const neftDate = filterdData[0]?.neftDate
+  const status = filterdData[0]?.status || 'Pending'
 
   return (
     <CModal
       size="xl"
       visible={isVisible}
       backdrop="static"
-      keyboard="false"
+      keyboard={false}
       onClose={() => setIsVisible(!isVisible)}
     >
-      <CModalHeader>
-        <CModalTitle>Neft Page</CModalTitle>
+      <CModalHeader className="bg-primary text-white">
+        <CModalTitle>🧾 NEFT #{selectedNeft} Details</CModalTitle>
       </CModalHeader>
-      <CModalBody>
-        <CContainer>
-          <h2>Neft No. : {selectedNeft}</h2>
-          <h2>Neft Date : {neftDate}</h2>
-        </CContainer>
+      <CModalBody className="bg-light">
+        <CCard className="mb-4 border-start border-4 border-primary shadow-sm">
+          <CCardBody>
+            <CRow>
+              <CCol>
+                <h6 className="text-muted mb-1">NEFT No</h6>
+                <h4 className="fw-bold text-primary">#{selectedNeft}</h4>
+              </CCol>
+              <CCol>
+                <h6 className="text-muted mb-1">Date</h6>
+                <h5 className="fw-semibold">{neftDate}</h5>
+              </CCol>
+              <CCol>
+                <h6 className="text-muted mb-1">Status</h6>
+                <CBadge
+                  color={
+                    status === 'Paid'
+                      ? 'success'
+                      : status === 'Partial'
+                        ? 'info'
+                        : status === 'Cancelled'
+                          ? 'secondary'
+                          : 'warning'
+                  }
+                  className="px-3 py-1"
+                >
+                  {status}
+                </CBadge>
+              </CCol>
+            </CRow>
+          </CCardBody>
+        </CCard>
+
         <CContainer className="row align-items-center justify-content-between mb-4">
-          {/* <!-- Left: Search Input --> */}
-          <CContainer className="col-md-4 mb-2 mb-md-0 ">
+          <CCol md={4}>
             <CFormInput type="text" className="form-control" placeholder="Search Party..." />
-          </CContainer>
-
-          {/* <!-- Right: Filter + Add New Buttons --> */}
-          <CContainer className="col-md-8 text-md-end ">
-            <CButton color="primary" onClick={() => navigate('/add-new-neft')}>
-              Add More Party
+          </CCol>
+          <CCol md={8} className="text-end">
+            <CButton
+              color="primary"
+              onClick={() =>
+                navigate(`/create-new-neft?neftNo=${selectedNeft}&neftDate=${neftDate}`)
+              }
+            >
+              + Add More Party
             </CButton>
-          </CContainer>
+          </CCol>
         </CContainer>
 
-        <CTable responsive hover>
-          <CTableHead>
+        <CTable bordered responsive hover className="shadow-sm text-center">
+          <CTableHead color="light">
             <CTableRow>
-              <CTableHeaderCell scope="col">Party Name</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Amount</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Edit</CTableHeaderCell>
-              <CTableHeaderCell scope="col">SMC Pdf</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Pali Pdf</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Delete</CTableHeaderCell>
+              <CTableHeaderCell>Party Name</CTableHeaderCell>
+              <CTableHeaderCell>Status</CTableHeaderCell>
+              <CTableHeaderCell>Bill Count</CTableHeaderCell>
+              <CTableHeaderCell>Total Amount</CTableHeaderCell>
+              <CTableHeaderCell>Edit</CTableHeaderCell>
+              <CTableHeaderCell>SMC Pdf</CTableHeaderCell>
+              <CTableHeaderCell>Pali Pdf</CTableHeaderCell>
+              <CTableHeaderCell>Delete</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
@@ -77,14 +114,52 @@ export default function NeftPageModal({ isVisible, setIsVisible, selectedNeft })
               return partyList.parties.map((party, index) => (
                 <CTableRow key={`${partyList.neftNo}-${index}`}>
                   <CTableDataCell>{party.partyName}</CTableDataCell>
-                  <CTableDataCell>{party.partyTotal}</CTableDataCell>
                   <CTableDataCell>
-                    <CIcon icon={cilPencil} />
+                    <CBadge
+                      color={
+                        party.partyStatus === 'Paid'
+                          ? 'success'
+                          : party.partyStatus === 'Partial'
+                            ? 'info'
+                            : party.partyStatus === 'Cancelled'
+                              ? 'secondary'
+                              : 'warning'
+                      }
+                      className="px-3 py-1"
+                    >
+                      {party.partyStatus || 'Pending'}
+                    </CBadge>
                   </CTableDataCell>
-                  <CTableDataCell>SMC PDF</CTableDataCell>
-                  <CTableDataCell>PALI PDF</CTableDataCell>
+                  <CTableDataCell>{party.bills?.length || 0}</CTableDataCell>
+                  <CTableDataCell>₹ {party.partyTotal}</CTableDataCell>
                   <CTableDataCell>
-                    <CIcon icon={cilTrash} />
+                    <CIcon
+                      icon={cilPencil}
+                      className="text-primary cursor-pointer"
+                      onClick={() =>
+                        navigate('/create-new-neft', {
+                          state: {
+                            mode: 'edit',
+                            neftNo: partyList.neftNo,
+                            neftDate: partyList.neftDate,
+                            partyData: party, // full party object
+                          },
+                        })
+                      }
+                    />
+                  </CTableDataCell>
+                  <CTableDataCell>
+                    <CButton color="info" size="sm">
+                      SMC PDF
+                    </CButton>
+                  </CTableDataCell>
+                  <CTableDataCell>
+                    <CButton color="warning" size="sm">
+                      PALI PDF
+                    </CButton>
+                  </CTableDataCell>
+                  <CTableDataCell>
+                    <CIcon icon={cilTrash} className="text-danger cursor-pointer" />
                   </CTableDataCell>
                 </CTableRow>
               ))
@@ -92,7 +167,6 @@ export default function NeftPageModal({ isVisible, setIsVisible, selectedNeft })
           </CTableBody>
         </CTable>
 
-        {/* Pagination */}
         <CPagination align="center" className="mt-3">
           <CPaginationItem
             aria-label="Previous"

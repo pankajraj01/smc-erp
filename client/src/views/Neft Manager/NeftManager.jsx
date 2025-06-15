@@ -7,16 +7,12 @@ import {
   CFormInput,
   CPagination,
   CPaginationItem,
-  CTable,
-  CTableBody,
-  CTableDataCell,
-  CTableHead,
-  CTableHeaderCell,
-  CTableRow,
 } from '@coreui/react'
-import neftData from '../../data/neftData'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+
+import neftData from '../../data/neftData'
+import NeftTable from './NeftTable'
 import NeftPageModal from './NeftPageModal'
 
 export default function NeftManager() {
@@ -24,6 +20,7 @@ export default function NeftManager() {
   const [neftPageVisible, setNeftPageVisible] = useState(false)
   const [selectedNeft, setSelectedNeft] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
+
   const ITEMS_PER_PAGE = 5
   const totalPages = Math.ceil(nefts.length / ITEMS_PER_PAGE)
   const navigate = useNavigate()
@@ -33,89 +30,52 @@ export default function NeftManager() {
     currentPage * ITEMS_PER_PAGE,
   )
 
-  // const neftClickHandle = (neftNo)=>{
-  //   setNeftPageVisible(!neftPageVisible)
-  //   setSelectedNeft(neftNo)
-  // }
+  const handleViewNeft = (neftNo) => {
+    setSelectedNeft(neftNo)
+    setNeftPageVisible(true)
+  }
 
   return (
-    <CCard>
-      <CCardHeader>Neft Manager</CCardHeader>
+    <CCard className="shadow-sm">
+      <CCardHeader className="bg-primary text-white">
+        <h5 className="mb-0">💸 NEFT Manager</h5>
+      </CCardHeader>
       <CCardBody>
+        {/* Search and Actions */}
         <CContainer className="row align-items-center justify-content-between mb-4">
-          {/* <!-- Left: Search Input --> */}
-          <CContainer className="col-md-4 mb-2 mb-md-0 ">
-            <CFormInput type="text" className="form-control" placeholder="Search orders..." />
+          <CContainer className="col-md-4 mb-2 mb-md-0">
+            <CFormInput type="text" placeholder="🔍 Search NEFTs..." />
           </CContainer>
-
-          {/* <!-- Right: Filter + Add New Buttons --> */}
-          <CContainer className="col-md-8 text-md-end ">
-            <CButton className="btn btn-outline-secondary me-2">
+          <CContainer className="col-md-8 text-md-end">
+            <CButton color="secondary" className="me-2">
               <i className="bi bi-funnel"></i> Filter
             </CButton>
-            <CButton color="primary" onClick={() => navigate('/add-new-neft')}>
-              Add New Neft
+            <CButton color="success" onClick={() => navigate('/create-new-neft')}>
+              + Create New NEFT
             </CButton>
           </CContainer>
         </CContainer>
 
-        <CTable responsive hover>
-          <CTableHead>
-            <CTableRow>
-              <CTableHeaderCell scope="col">Neft No</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Neft Date</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Neft Amount</CTableHeaderCell>
-              <CTableHeaderCell scope="col">SMC Pdf</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Pali Pdf</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Delete</CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {paginatedData.map((neft) => (
-              <CTableRow key={neft.neftNo}>
-                <CTableDataCell>
-                  <CButton
-                    color="secondary"
-                    onClick={() => {
-                      setSelectedNeft(neft.neftNo)
-                      setNeftPageVisible(!neftPageVisible)
-                    }}
-                  >
-                    {neft.neftNo}
-                  </CButton>
-                </CTableDataCell>
-                <CTableDataCell>{neft.neftDate}</CTableDataCell>
-                <CTableDataCell>{neft.totalNeftAmount}</CTableDataCell>
-                <CTableDataCell>
-                  <CButton color="info">SMFT PDF</CButton>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <CButton color="warning">PALI PDF</CButton>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <CButton color="danger">X</CButton>
-                </CTableDataCell>
-              </CTableRow>
-            ))}
-          </CTableBody>
-        </CTable>
+        {/* NEFT Table */}
+        <NeftTable nefts={paginatedData} onView={handleViewNeft} />
 
+        {/* Modal */}
         {neftPageVisible && (
           <NeftPageModal
             isVisible={neftPageVisible}
-            setIsVisible={() => setNeftPageVisible(!neftPageVisible)}
+            setIsVisible={() => setNeftPageVisible(false)}
             selectedNeft={selectedNeft}
           />
         )}
 
         {/* Pagination */}
-        <CPagination align="center" className="mt-3">
+        <CPagination align="center" className="mt-4">
           <CPaginationItem
             aria-label="Previous"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
-            <span aria-hidden="true">&laquo;</span>
+            &laquo;
           </CPaginationItem>
           {[...Array(totalPages)].map((_, index) => (
             <CPaginationItem
@@ -131,7 +91,7 @@ export default function NeftManager() {
             onClick={() => setCurrentPage(currentPage + 1)}
             disabled={currentPage === totalPages}
           >
-            <span aria-hidden="true">&raquo;</span>
+            &raquo;
           </CPaginationItem>
         </CPagination>
       </CCardBody>
