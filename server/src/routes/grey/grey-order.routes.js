@@ -1,6 +1,9 @@
+// 📦 Import Dependencies
 const express = require("express");
-const greyOrderController = require("../../controllers/grey-controllers/grey.order.controllers");
-const validateGreyOrder = require("../../middleware/validate-grey-order");
+
+// 🧠 Import Middleware and Controllers
+const validateGreyOrder = require("../../middleware/validate-grey-order.middleware");
+const greyOrderController = require("../../controllers/grey/grey-order.controller");
 
 const router = express.Router();
 

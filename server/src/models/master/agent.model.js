@@ -1,8 +1,9 @@
+// 📦 Import Dependencies
 const mongoose = require("mongoose");
-
-const bankSchema = require("./bank");
-
 const Schema = mongoose.Schema;
+
+// 🔗 Import Mongoose Schema/Model
+const bankSchema = require("./bank.model");
 
 const agentsSchema = Schema(
   {

@@ -12,10 +12,15 @@ server/
 │   ├── config/            # App & DB config
 │   ├── controllers/       # Request handling logic
 │   │   ├── master/
+|   |   |   ├── agent.controller.js
+|   |   |   ├── item.controller.js
 │   │   ├── grey/
+|   |   |   ├── grey.order.controller.js
 │   │   └── neft/
 │   ├── models/            # Mongoose schemas
 │   │   ├── master/
+|   |   |   ├── agent.model.js
+|   |   |   ├── item.model.js
 │   │   ├── grey/
 │   │   └── neft/
 │   ├── routes/            # Express routers

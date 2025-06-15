@@ -1,8 +1,10 @@
+// 📦 Import Dependencies
 const express = require("express");
 
 const router = express.Router();
 
-const usersControllers = require("../../controllers/master-controllers/users-controllers");
+// 🧠 Import Controller
+const usersControllers = require("../../controllers/master/user.controller");
 
 router.get("/", usersControllers.getUsers);
 

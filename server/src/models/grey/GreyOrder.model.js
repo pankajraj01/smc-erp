@@ -1,5 +1,9 @@
+// 📦 Import Dependencies
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+
+// 🔗 Import Mongoose Schema/Model
+
 const greyOrderSchema = new Schema(
   {
     orderNo: { type: String, required: true, unique: true }, // Order Number

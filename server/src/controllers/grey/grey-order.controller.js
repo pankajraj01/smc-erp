@@ -1,9 +1,24 @@
-const GreyOrderModel = require("../../models/grey-manager/greyOrder.model");
-const HttpError = require("../../models/http-error");
+/**
+ * -------------------------------------------------------
+ * 📄 File         : grey-order.controller.js
+ * 🧩 Layer        : Controller
+ * 📦 Purpose      : Handles CRUD operations for Grey Orders
+ * 📚 Description  : This controller handles API logic related to
+ *                   creating, reading, updating, and deleting grey orders.
+ * 🧠 Author       : Pankaj Rajpurohit / Team SMC
+ * 🕒 Last Updated : 2025-06-15
+ * -------------------------------------------------------
+ */
+
+// 📦 Import Dependencies
 const { validationResult } = require("express-validator");
+
+// 📂 Import Files
+const GreyOrderModel = require("../../models/grey/GreyOrder.model");
+const HttpError = require("../../utils/httpError");
 const getNextSequence = require("../../utils/getNextSequence");
 
-// Get All Grey Orders
+// 🧾 Get All Grey Orders
 const getAllGreyOrders = async (req, res, next) => {
   try {
     const greyOrders = await GreyOrderModel.find();
@@ -17,7 +32,7 @@ const getAllGreyOrders = async (req, res, next) => {
   }
 };
 
-// Get Grey Order by Id
+// 🧾 Get Grey Order by ID
 const getGreyOrderById = async (req, res, next) => {
   const orderId = req.params.orderId;
 
@@ -37,14 +52,13 @@ const getGreyOrderById = async (req, res, next) => {
   }
 };
 
-// Create New Grey Order
-// ✅ Create New Grey Order
+// 🧾 Create New Grey Order
 const createGreyOrder = async (req, res, next) => {
   try {
-    // 1. Generate next order number safely
+    // 1️⃣ Generate next order number safely
     const orderNo = await getNextSequence("greyOrder");
 
-    // 2. Build new order
+    // 2️⃣ Build new order
     const newOrder = new GreyOrderModel({
       orderNo,
       orderDate: req.body.orderDate || new Date(),
@@ -56,7 +70,7 @@ const createGreyOrder = async (req, res, next) => {
       remarks: req.body.remarks || "",
     });
 
-    // 3. Save and respond
+    // 3️⃣ Save and respond
     await newOrder.save();
     res.status(201).json({ order: newOrder });
   } catch (err) {
@@ -64,29 +78,28 @@ const createGreyOrder = async (req, res, next) => {
     next(new HttpError("Failed to create order", 500));
   }
 };
-// Update Grey Order
+
+// 🧾 Update Existing Grey Order
 const updateGreyOrder = async (req, res, next) => {
   const orderId = req.params.orderId;
 
   try {
-    // 1. Validate request
+    // 1️⃣ Validate request
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       console.log("Validation Errors:", errors.array());
       throw new HttpError("Invalid input passed, please check your data", 422);
     }
 
-    const { orderNo, agentName, itemName, rate, than, partyName, remarks } =
-      req.body;
-    // const trimmedOrderNo = orderNo.trim();
+    const { agentName, itemName, rate, than, partyName, remarks } = req.body;
 
-    // 2. Check for existing order
+    // 2️⃣ Check if order exists
     const existingOrder = await GreyOrderModel.findById(orderId);
     if (!existingOrder) {
       throw new HttpError("Grey Order not found", 404);
     }
 
-    // 3. Update order
+    // 3️⃣ Update fields
     existingOrder.agentName = agentName;
     existingOrder.itemName = itemName;
     existingOrder.rate = rate;
@@ -109,7 +122,7 @@ const updateGreyOrder = async (req, res, next) => {
   }
 };
 
-// Delete Grey Order
+// 🧾 Delete Grey Order
 const deleteGreyOrder = async (req, res, next) => {
   const orderId = req.params.orderId;
 

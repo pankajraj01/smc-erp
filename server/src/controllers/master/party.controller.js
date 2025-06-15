@@ -1,6 +1,11 @@
-const Party = require("../../models/master-models/party");
-const HttpError = require("../../models/http-error");
+// 📦 Import Dependencies
 const { validationResult } = require("express-validator");
+
+// 🔗 Import Models
+const Party = require("../../models/master/party.model");
+
+// ⚙️ Import Services
+const HttpError = require("../../utils/httpError");
 
 // Get All Parties
 const getAllParties = async (req, res, next) => {

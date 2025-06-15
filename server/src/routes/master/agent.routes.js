@@ -1,21 +1,24 @@
+// 📦 Import Dependencies
 const express = require("express");
 const { check, body } = require("express-validator");
 const router = express.Router();
 
-const millController = require("../../controllers/master-controllers/mill-controllers"); // adjust if filename is different
+// 🧠 Import Controller
+const agentsController = require("../../controllers/master/agent.controller");
 
-// Get All Mills
-router.get("/", millController.getAllMills);
+// Get All Agents
+router.get("/", agentsController.getAllAgents);
 
-// Get Mill by Id
-router.get("/:millId", millController.getMillById);
+// Get Agent by Id
+router.get("/:agtId", agentsController.getAgentById);
 
-// Create New Mill
+//Create New Agent
 router.post(
   "/",
   [
-    check("millName").not().isEmpty().withMessage("Mill Name is required"),
-    body("bank.bankName").notEmpty().withMessage("Bank Name is required"),
+    check("agentName").not().isEmpty(),
+    check("type").not().isEmpty(),
+    body("bank.bankName").notEmpty().withMessage("Bank Name is Required"),
     body("bank.accountNo")
       .isLength({ min: 10, max: 16 })
       .withMessage("Account number must be 10 to 16 digits")
@@ -25,15 +28,16 @@ router.post(
       .matches(/^[A-Z]{4}0[A-Z0-9]{6}$/)
       .withMessage("Invalid IFSC format"),
   ],
-  millController.createMill
+  agentsController.createAgent
 );
 
-// Update Mill
+//Update Agent
 router.patch(
-  "/:millId",
+  "/:agtId",
   [
-    check("millName").not().isEmpty().withMessage("Mill Name is required"),
-    body("bank.bankName").notEmpty().withMessage("Bank Name is required"),
+    check("agentName").not().isEmpty(),
+    check("type").not().isEmpty(),
+    body("bank.bankName").notEmpty().withMessage("Bank Name is Required"),
     body("bank.accountNo")
       .isLength({ min: 10, max: 16 })
       .withMessage("Account number must be 10 to 16 digits")
@@ -43,10 +47,10 @@ router.patch(
       .matches(/^[A-Z]{4}0[A-Z0-9]{6}$/)
       .withMessage("Invalid IFSC format"),
   ],
-  millController.updatedMill
+  agentsController.updatedAgent
 );
 
-// Delete Mill By Id
-router.delete("/:millId", millController.deleteMill);
+// Delete Agent By Id
+router.delete("/:agtId", agentsController.deleteAgentById);
 
 module.exports = router;

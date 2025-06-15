@@ -1,7 +1,10 @@
+// Import Dependencies/Packages
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const HttpError = require("../models/http-error");
-const User = require("../models/master-models/user");
+
+// Import Files
+const HttpError = require("../../utils/httpError");
+const User = require("../../models/master/user.model");
 
 const login = async (req, res, next) => {
   const { userName, password } = req.body;

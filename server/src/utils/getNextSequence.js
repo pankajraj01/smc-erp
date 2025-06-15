@@ -1,7 +1,8 @@
-const CounterModel = require("../models/utils/counter.model");
+// Import Models
+const Counter = require("../models/utils/counter.model");
 
 const getNextSequence = async (sequenceName) => {
-  const result = await CounterModel.findByIdAndUpdate(
+  const result = await Counter.findByIdAndUpdate(
     { _id: sequenceName },
     { $inc: { seq: 1 } },
     { new: true, upsert: true }

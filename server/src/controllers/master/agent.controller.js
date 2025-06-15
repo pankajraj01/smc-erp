@@ -1,6 +1,11 @@
-const Agents = require("../../models/master-models/agents");
-const HttpError = require("../../models/http-error");
+// 📦 Import Dependencies
 const { validationResult } = require("express-validator");
+
+// 🔗 Import Models
+const Agents = require("../../models/master/agent.model");
+
+// ⚙️ Import Services
+const HttpError = require("../../utils/httpError");
 
 // Get All Agents
 const getAllAgents = async (req, res, next) => {

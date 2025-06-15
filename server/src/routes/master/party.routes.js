@@ -1,8 +1,10 @@
+// 📦 Import Dependencies
 const express = require("express");
 const { check, body } = require("express-validator");
 const router = express.Router();
 
-const partyController = require("../../controllers/master-controllers/party-controllers");
+// 🧠 Import Controller
+const partyController = require("../../controllers/master/party.controller");
 
 // Get All Parties
 router.get("/", partyController.getAllParties);

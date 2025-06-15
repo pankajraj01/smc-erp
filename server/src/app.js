@@ -1,17 +1,21 @@
+// 📦 Import Dependencies
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
-const authRoutes = require("./routes/auth-routes");
-const usersRoutes = require("./routes/master-routes/users-routes");
+// 🛣️ Import Routes
+const authRoutes = require("./routes/auth/auth.routes");
+const usersRoutes = require("./routes/master/user.routes");
 
-const itemRoutes = require("./routes/master-routes/item-routes");
-const agentsRotes = require("./routes/master-routes/agents-routes");
-const partyRoutes = require("./routes/master-routes/party-routes");
-const millRoutes = require("./routes/master-routes/mill-routes");
+const itemRoutes = require("./routes/master/item.routes");
+const agentsRotes = require("./routes/master/agent.routes");
+const partyRoutes = require("./routes/master/party.routes");
+const millRoutes = require("./routes/master/mill.routes");
 
-const greyOrderRoutes = require("./routes/grey-routes/greyOrder.routes");
-const HttpError = require("./models/http-error");
+const greyOrderRoutes = require("./routes/grey/grey-order.routes");
+
+// ⚙️ Import Services
+const HttpError = require("./utils/httpError");
 
 const app = express();
 app.use(bodyParser.json());

@@ -1,6 +1,11 @@
-const Mill = require("../../models/master-models/mill");
-const HttpError = require("../../models/http-error");
+// 📦 Import Dependencies
 const { validationResult } = require("express-validator");
+
+// 🔗 Import Models
+const Mill = require("../../models/master/mill.model");
+
+// ⚙️ Import Services
+const HttpError = require("../../utils/httpError");
 
 // Get All Mills
 const getAllMills = async (req, res, next) => {

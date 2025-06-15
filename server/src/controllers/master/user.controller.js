@@ -1,7 +1,12 @@
+// 📦 Import Dependencies
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const HttpError = require("../../models/http-error");
-const User = require("../../models/master-models/user");
+
+// 🔗 Import Models
+const User = require("../../models/master/user.model");
+
+// ⚙️ Import Services
+const HttpError = require("../../utils/httpError");
 
 const getUsers = async (req, res, next) => {
   let users;

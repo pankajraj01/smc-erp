@@ -1,8 +1,12 @@
+// 📦 Import Dependencies
 const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
 
-const HttpError = require("../../models/http-error");
-const Item = require("../../models/master-models/item");
+// 🔗 Import Models
+const Item = require("../../models/master/item.model");
+
+// ⚙️ Import Services
+const HttpError = require("../../utils/httpError");
 
 // Get All Items
 const getAllItems = async (req, res, next) => {
