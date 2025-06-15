@@ -131,7 +131,7 @@ Place automated cron jobs and DB backups in:
 
 ---
 
-For backend setup and API docs, refer to `../client/README.md`.
+For Frontend setup and API docs, refer to `../client/README.md`.
 
 ## 📞 Contact
 
