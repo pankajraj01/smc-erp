@@ -3,15 +3,15 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 // 🔗 Import Mongoose Schema/Model
-const bankSchema = require("./bank.model");
+const BankSchema = require("./bank.model");
 
-const partySchema = Schema(
+const PartySchema = Schema(
   {
     partyName: { type: String, required: true, unique: true },
     type: { type: String, required: true },
-    bank: { type: bankSchema, require: true },
+    bank: { type: BankSchema, require: true },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Parties", partySchema);
+module.exports = mongoose.model("Party", PartySchema);

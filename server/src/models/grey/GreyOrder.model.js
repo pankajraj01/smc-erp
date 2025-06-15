@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 // 🔗 Import Mongoose Schema/Model
 
-const greyOrderSchema = new Schema(
+const GreyOrderSchema = new Schema(
   {
     orderNo: { type: String, required: true, unique: true }, // Order Number
     orderDate: { type: Date, default: Date.now }, // Order Date comes automatically but can we change
@@ -18,4 +18,4 @@ const greyOrderSchema = new Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("GreyOrder", greyOrderSchema);
+module.exports = mongoose.model("GreyOrder", GreyOrderSchema);

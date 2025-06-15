@@ -3,14 +3,14 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 // 🔗 Import Mongoose Schema/Model
-const bankSchema = require("./bank.model");
+const BankSchema = require("./bank.model");
 
-const millSchema = Schema(
+const MillSchema = Schema(
   {
     millName: { type: String, required: true, unique: true },
-    bank: { type: bankSchema, require: true },
+    bank: { type: BankSchema, require: true },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Mill", millSchema);
+module.exports = mongoose.model("Mill", MillSchema);
