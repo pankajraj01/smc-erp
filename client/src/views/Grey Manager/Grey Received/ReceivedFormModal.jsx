@@ -100,7 +100,7 @@ export default function ReceivedFormModal({ isVisible, setIsVisible, onSubmit })
               </CFormSelect>
             </CCol>
             <CCol>
-              <CButton color="info" onClick={() => navigate('/master/party-master')}>
+              <CButton color="info" onClick={() => navigate('/api/master/party')}>
                 +
               </CButton>
             </CCol>
@@ -124,7 +124,7 @@ export default function ReceivedFormModal({ isVisible, setIsVisible, onSubmit })
               </CFormSelect>
             </CCol>
             <CCol>
-              <CButton color="info" onClick={() => navigate('/master/item-master')}>
+              <CButton color="info" onClick={() => navigate('/api/master/items')}>
                 +
               </CButton>
             </CCol>
