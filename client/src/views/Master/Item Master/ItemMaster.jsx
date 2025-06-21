@@ -31,7 +31,7 @@ export default function ItemMaster() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/master/items')
+        const res = await fetch('http://localhost:5000/api/master/item')
         const data = await res.json()
         setItems(data.items || [])
       } catch (err) {
@@ -47,8 +47,8 @@ export default function ItemMaster() {
   const handleSaveItem = async (item) => {
     try {
       const url = item._id
-        ? `http://localhost:5000/api/master/items/${item._id}`
-        : 'http://localhost:5000/api/master/items'
+        ? `http://localhost:5000/api/master/item/${item._id}`
+        : 'http://localhost:5000/api/master/item'
       const method = item._id ? 'PATCH' : 'POST'
 
       const res = await fetch(url, {
@@ -76,7 +76,7 @@ export default function ItemMaster() {
   // ❌ Delete item
   const handleDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/master/items/${itemToDelete._id}`, {
+      const res = await fetch(`http://localhost:5000/api/master/item/${itemToDelete._id}`, {
         method: 'DELETE',
       })
       const data = await res.json()

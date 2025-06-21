@@ -62,8 +62,8 @@ export default function PartyMaster() {
     try {
       const isEdit = !!party._id
       const url = isEdit
-        ? `http://localhost:5000/api/master/parties/${party._id}`
-        : 'http://localhost:5000/api/master/parties'
+        ? `http://localhost:5000/api/master/party/${party._id}`
+        : 'http://localhost:5000/api/master/party'
       const method = isEdit ? 'PATCH' : 'POST'
 
       const res = await fetch(url, {
@@ -86,7 +86,7 @@ export default function PartyMaster() {
   // Delete party
   const handleDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/master/parties/${partyToDelete._id}`, {
+      const res = await fetch(`http://localhost:5000/api/master/party/${partyToDelete._id}`, {
         method: 'DELETE',
       })
       const data = await res.json()

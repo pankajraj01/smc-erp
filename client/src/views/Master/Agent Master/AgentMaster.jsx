@@ -33,7 +33,7 @@ export default function AgentMaster() {
   // ✅ Fetch agents once on component mount
   const fetchAgents = async (goToLastPage = false) => {
     try {
-      const res = await fetch('http://localhost:5000/api/master/agents')
+      const res = await fetch('http://localhost:5000/api/master/agent')
       const data = await res.json()
       const allAgents = data.agents || []
 
@@ -61,8 +61,8 @@ export default function AgentMaster() {
       const isEdit = !!agent._id
 
       const url = agent._id
-        ? `http://localhost:5000/api/master/agents/${agent._id}`
-        : 'http://localhost:5000/api/master/agents'
+        ? `http://localhost:5000/api/master/agent/${agent._id}`
+        : 'http://localhost:5000/api/master/agent'
       const method = agent._id ? 'PATCH' : 'POST'
 
       const res = await fetch(url, {
@@ -89,7 +89,7 @@ export default function AgentMaster() {
   // ✅ Handle delete confirmation
   const handleDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/master/agents/${agentToDelete._id}`, {
+      const res = await fetch(`http://localhost:5000/api/master/agent/${agentToDelete._id}`, {
         method: 'DELETE',
       })
       const data = await res.json()

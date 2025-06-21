@@ -21,7 +21,9 @@ const AgentMaster = React.lazy(() => import('./views/Master/Agent Master/AgentMa
 
 // Neft Manager
 const NeftManager = React.lazy(() => import('./views/Neft Manager/NeftManager'))
-const CreateNewNeft = React.lazy(() => import('./views/Neft Manager/CreateNewNeft'))
+// const CreateNewNeft = React.lazy(() => import('./views/Neft Manager/CreateNewNeft'))
+const CreateNewNeft = React.lazy(() => import('./views/Neft Manager/index'))
+const NeftPage = React.lazy(() => import('./views/Neft Manager/NeftPage'))
 
 // const Breadcrumbs = React.lazy(() => import('./views/base/breadcrumbs/Breadcrumbs'))
 
@@ -37,14 +39,21 @@ const routes = [
   { path: '/grey-received', name: 'Grey Received', element: GreyReceived },
 
   // Master
-  { path: '/api/master/items', name: 'Item Master', element: ItemMaster },
+  { path: '/api/master/item', name: 'Item Master', element: ItemMaster },
   { path: '/api/master/party', name: 'Party Master', element: PartyMaster },
-  { path: '/api/master/mills', name: 'Mill Master', element: MillMaster },
-  { path: '/api/master/agents', name: 'Agent Master', element: AgentMaster },
+  { path: '/api/master/mill', name: 'Mill Master', element: MillMaster },
+  { path: '/api/master/agent', name: 'Agent Master', element: AgentMaster },
 
   // Neft Manager
-  { path: '/neft-manager', name: 'Neft Manager', element: NeftManager },
-  { path: '/create-new-neft', name: 'Create New Neft', element: CreateNewNeft },
+  { path: '/api/neft-manager', name: 'Neft Manager', element: NeftManager },
+  { path: '/api/neft-manager/create', name: 'Create New Neft', element: CreateNewNeft }, // add new
+  { path: '/api/neft-manager/create/:neftId', name: 'Create New Neft', element: CreateNewNeft }, // add party to neft
+  {
+    path: '/api/neft-manager/create/:neftId/party/:partyId',
+    name: 'Create New Neft',
+    element: CreateNewNeft,
+  }, // edit/update data
+  { path: '/api/neft-manager/:neftId', name: 'Neft Page', element: NeftPage }, // view single neft
 
   { path: '/base/accordion', name: 'Accordion', element: Accordion },
 

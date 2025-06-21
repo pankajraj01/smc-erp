@@ -55,7 +55,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Neft Manager',
-    to: '/neft-manager',
+    to: '/api/neft-manager',
     icon: <CIcon icon={cilCalculator} customClassName="nav-icon" />,
   },
 
@@ -69,7 +69,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Item Master',
-    to: '/api/master/items',
+    to: '/api/master/item',
     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
   },
 
@@ -83,14 +83,14 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Agent Master',
-    to: '/api/master/agents',
+    to: '/api/master/agent',
     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
   },
 
   {
     component: CNavItem,
     name: 'Mill Master',
-    to: '/api/master/mills',
+    to: '/api/master/mill',
     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
   },
 

@@ -22,7 +22,7 @@ export default function MillMaster() {
   useEffect(() => {
     const fetchMills = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/master/mills')
+        const res = await fetch('http://localhost:5000/api/master/mill')
         const data = await res.json()
         setMills(data.mills || [])
       } catch (err) {
@@ -40,8 +40,8 @@ export default function MillMaster() {
     try {
       const isEdit = !!mill._id
       const url = isEdit
-        ? `http://localhost:5000/api/master/mills/${mill._id}`
-        : 'http://localhost:5000/api/master/mills'
+        ? `http://localhost:5000/api/master/mill/${mill._id}`
+        : 'http://localhost:5000/api/master/mill'
       const method = isEdit ? 'PATCH' : 'POST'
 
       const res = await fetch(url, {
@@ -72,7 +72,7 @@ export default function MillMaster() {
   // Delete mill
   const handleDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/master/mills/${millToDelete._id}`, {
+      const res = await fetch(`http://localhost:5000/api/master/mill/${millToDelete._id}`, {
         method: 'DELETE',
       })
       const data = await res.json()

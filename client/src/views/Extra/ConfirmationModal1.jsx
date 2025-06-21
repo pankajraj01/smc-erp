@@ -1,25 +1,24 @@
+// 🌟 BEAUTIFUL CONFIRMATION MODAL — ConfirmationModal.jsx
 import {
+  CBadge,
+  CButton,
+  CCard,
+  CCardBody,
+  CCol,
+  CContainer,
   CModal,
   CModalBody,
   CModalHeader,
   CModalTitle,
-  CButton,
   CRow,
-  CCol,
-  CCard,
-  CCardBody,
-  CCardHeader,
   CTable,
   CTableBody,
+  CTableDataCell,
   CTableHead,
   CTableHeaderCell,
-  CTableDataCell,
   CTableRow,
-  CContainer,
-  CBadge,
 } from '@coreui/react'
-
-import formatDate from '../../utils/formatDate'
+import { useNavigate } from 'react-router-dom'
 
 export default function ConfirmationModal({
   isVisible,
@@ -31,14 +30,70 @@ export default function ConfirmationModal({
   totalPartyNeftAmount,
   tdsTotal,
   remark,
-  onFinalSave,
 }) {
-  return (
-    <CModal size="xl" visible={isVisible} backdrop="static" keyboard={false} onClose={setIsVisible}>
-      <CModalHeader className="bg-success text-white">
-        <CModalTitle>🧾 Confirm NEFT Submission</CModalTitle>
-      </CModalHeader>
+  const navigate = useNavigate()
 
+  const handleSave = async () => {
+    const finalPayload = {
+      neftNo,
+      neftDate: new Date(neftDate), // ensure it's a Date object
+      neftAmount: totalPartyNeftAmount,
+      tdsTotal,
+      neftStatus: 'Pending',
+      remark,
+      parties: [
+        {
+          partyId: formData.partyId, // ✅ now real ID from DB
+          partyName: formData.partyName,
+          bank: {
+            bankName: formData.bankName,
+            accNo: formData.accNo,
+            ifsc: formData.ifsc,
+          },
+          bills: billRows.map((bill) => ({
+            ...bill,
+            billDate: new Date(bill.billDate),
+          })),
+          totalPartyNeftAmount,
+          remark,
+          partyStatus: 'Pending',
+        },
+      ],
+    }
+    console.log('payload', finalPayload)
+
+    const res = await fetch('http://localhost:5000/api/neft-request/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(finalPayload),
+    })
+
+    let result = {}
+    try {
+      result = await res.json()
+    } catch (e) {
+      console.error('❌ Failed to parse JSON:', e)
+    }
+
+    if (res.ok) {
+      alert('✅ NEFT saved successfully!')
+      setIsVisible(false)
+    } else {
+      alert('❌ Failed to save: ' + (result.message || 'Server Error'))
+    }
+  }
+
+  return (
+    <CModal
+      size="xl"
+      visible={isVisible}
+      backdrop="static"
+      keyboard={false}
+      onClose={() => setIsVisible(false)}
+    >
+      <CModalHeader className="bg-success text-white">
+        <CModalTitle>✅ Confirm NEFT Entry</CModalTitle>
+      </CModalHeader>
       <CModalBody>
         {/* Party & Bank Section */}
         <CCard className="shadow-sm mb-4 border-start border-success border-4">
@@ -91,7 +146,7 @@ export default function ConfirmationModal({
                       <small className="text-muted">Date</small>
                     </CCol>
                     <CCol>
-                      <h6 className="fw-semibold text-dark mb-0">{formatDate(neftDate)}</h6>
+                      <h6 className="fw-semibold text-dark mb-0">{neftDate}</h6>
                     </CCol>
                   </CRow>
 
@@ -144,13 +199,13 @@ export default function ConfirmationModal({
                 {billRows.map((row, index) => (
                   <CTableRow key={index}>
                     <CTableDataCell>{index + 1}</CTableDataCell>
-                    <CTableDataCell>{row.billNo || '-'}</CTableDataCell>
-                    <CTableDataCell>{formatDate(row.billDate)}</CTableDataCell>
-                    <CTableDataCell>{row.billAmount || 0}</CTableDataCell>
-                    <CTableDataCell>{row.discount || 0}</CTableDataCell>
-                    <CTableDataCell>{row.rd || 0}</CTableDataCell>
-                    <CTableDataCell>{row.tds || 0}</CTableDataCell>
-                    <CTableDataCell>{row.netAmount || 0}</CTableDataCell>
+                    <CTableDataCell>{row.billNo}</CTableDataCell>
+                    <CTableDataCell>{row.billDate}</CTableDataCell>
+                    <CTableDataCell>{row.billAmount}</CTableDataCell>
+                    <CTableDataCell>{row.discount}</CTableDataCell>
+                    <CTableDataCell>{row.rd}</CTableDataCell>
+                    <CTableDataCell>{row.tds}</CTableDataCell>
+                    <CTableDataCell>{row.netAmount}</CTableDataCell>
                   </CTableRow>
                 ))}
               </CTableBody>
@@ -190,7 +245,7 @@ export default function ConfirmationModal({
             <CButton color="danger" variant="outline" onClick={() => setIsVisible(false)}>
               Cancel
             </CButton>
-            <CButton color="success" onClick={onFinalSave}>
+            <CButton color="success" onClick={handleSave}>
               ✅ Confirm & Save
             </CButton>
           </CCol>

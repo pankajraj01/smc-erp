@@ -18,15 +18,18 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import partyList from '../../data/partyList'
-import neftData from '../../data/neftData'
 import Select from 'react-select'
-import ConfirmationModal from './ConfirmationModal'
+import ConfirmationModal from './ConfirmationModal1'
+import formatDate from '../../utils/formatDate'
+import formatForInputDate from '../../utils/formatForInputDate'
 
-export default function AddNewNeftBeautiful() {
+export default function CreateNewNeft() {
   const location = useLocation()
+  const navigate = useNavigate()
+  const [visible, setVisible] = useState(false)
+
   // 1️⃣ Get query params (for Add More Party)
   const params = new URLSearchParams(location.search)
   const urlNeftNo = params.get('neftNo')
@@ -38,42 +41,120 @@ export default function AddNewNeftBeautiful() {
   const passedNeftNo = location.state?.neftNo
   const passedNeftDate = location.state?.neftDate
 
-  const navigate = useNavigate()
-  const [visible, setVisible] = useState(false)
+  const [neftNo, setNeftNo] = useState(null)
+
+  useEffect(() => {
+    const fetchNeftDataAndSetNo = async () => {
+      if (passedNeftNo || urlNeftNo) {
+        setNeftNo(passedNeftNo || urlNeftNo)
+        return
+      }
+
+      try {
+        const res = await fetch('http://localhost:5000/api/neft-request') // replace with your endpoint
+        const data = await res.json()
+
+        const allNefts = data?.nefts || []
+
+        // Get highest neftNo from the list
+        const lastNeftNo =
+          allNefts.length > 0 ? Math.max(...allNefts.map((n) => parseInt(n.neftNo) || 0)) : 0
+
+        setNeftNo(lastNeftNo + 1)
+      } catch (err) {
+        console.error('Failed to fetch NEFT data', err)
+        setNeftNo('ERR')
+      }
+    }
+
+    fetchNeftDataAndSetNo()
+  }, [passedNeftNo, urlNeftNo])
+
+  useEffect(() => {
+    const fetchParties = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/master/party')
+        const data = await res.json()
+        setParties(data.parties || []) // adjust key as per your response
+        console.log(('Fetched parties:', data.parties))
+      } catch (err) {
+        console.error('Failed to fetch parties', err)
+      }
+    }
+
+    fetchParties()
+  }, [])
 
   // 3️⃣ Final values (prioritize edit > query > fallback)
-  const neftNo = passedNeftNo || urlNeftNo || neftData.length + 1
-  const neftDate = passedNeftDate || urlNeftDate || new Date().toLocaleDateString('en-IN')
+  // const neftNo = passedNeftNo || urlNeftNo || neftData.length + 1
+  const neftDate = passedNeftDate || urlNeftDate || new Date().toISOString().split('T')[0]
+  const [parties, setParties] = useState([])
 
   const [formData, setFormData] = useState({
+    partyId: initialParty?.partyId || '',
     partyName: initialParty?.partyName || '',
     bankName: initialParty?.bank?.bankName || '',
-    accountNo: initialParty?.bank?.accountNo || '',
-    ifscCode: initialParty?.bank?.ifsc || '',
+    accNo: initialParty?.bank?.accNo || '',
+    ifsc: initialParty?.bank?.ifsc || '',
   })
-  const [billRows, setBillRows] = useState(
-    initialParty?.bills || [
-      { billNo: '', date: '', amount: '', discount: '', rd: '', tds: '', finalAmount: '' },
-    ],
-  )
-  const [totalNetAmount, setTotalNetAmount] = useState(0)
-  const [totalTdsAmount, setTotalTdsAmount] = useState(0)
-  const [remark, setRemark] = useState('')
+  const [billRows, setBillRows] = useState([
+    { billNo: '', billDate: '', billAmount: '', discount: '', rd: '', tds: '', netAmount: '' },
+  ])
+  const [totalPartyNeftAmount, setTotalPartyNeftAmount] = useState(0)
+  const [tdsTotal, setTdsTotal] = useState(0)
+  const [remark, setRemark] = useState(initialParty?.remark || '')
+  const options = parties.map((p) => ({
+    value: p._id, // 👈 use _id as value
+    label: p.partyName,
+  }))
 
-  const options = partyList.map((p) => ({ value: p.partyName, label: p.partyName }))
+  // 🔁 Calculate totals Function
+  const calculateTotals = (rows) => {
+    const totalAmount = rows.reduce((sum, row) => sum + (parseFloat(row.netAmount) || 0), 0)
+    const totalTds = rows.reduce((sum, row) => sum + (parseFloat(row.tds) || 0), 0)
+    setTotalPartyNeftAmount(totalAmount)
+    setTdsTotal(totalTds)
+  }
 
-  const handlePartyChange = (e) => {
-    const selectedParty = e.target.value
-    const selected = partyList.find((p) => p.partyName === selectedParty)
-    if (selected && selected.bankDetail) {
-      setFormData({
-        partyName: selected.partyName,
-        bankName: selected.bankDetail.bankName || '',
-        accountNo: selected.bankDetail.accountNo || '',
-        ifscCode: selected.bankDetail.ifscCode || '',
-      })
-    } else {
-      setFormData({ partyName: selectedParty, bankName: '', accountNo: '', ifscCode: '' })
+  // 🧩 Initialize bill rows if in edit mode, Fetch Parties
+  useEffect(() => {
+    if (isEditMode && initialParty?.partyId) {
+      const selectedParty = parties.find((p) => p._id === initialParty.partyId)
+      if (selectedParty) {
+        setFormData((prev) => ({
+          ...prev,
+          partyId: selectedParty._id,
+          partyName: selectedParty.partyName,
+          bankName: selectedParty.bank?.bankName || '',
+          accNo: selectedParty.bank?.accNo || '',
+          ifsc: selectedParty.bank?.ifsc || '',
+        }))
+      }
+    }
+  }, [isEditMode, parties, initialParty])
+
+  const handlePartyChange = (selected) => {
+    const selectedParty = parties.find((p) => p._id === selected.value)
+    console.log('selectedParty:', selectedParty)
+    console.log('selectedParty ID:', selectedParty.id)
+    console.log('selectedParty Name:', selectedParty.partyName)
+    console.log('selectedParty Bank Name:', selectedParty.bank?.bankName)
+    console.log('selectedParty Acc No:', selectedParty.bank?.accNo)
+    console.log('selectedParty IFSC:', selectedParty.bank?.ifsc)
+
+    if (selectedParty) {
+      setFormData((prev) => ({
+        ...prev,
+        partyId: selectedParty._id,
+        partyName: selectedParty.partyName,
+        bankName: selectedParty.bank?.bankName || '',
+        accNo: selectedParty.bank?.accNo || '',
+        ifsc: selectedParty.bank?.ifsc || '',
+      }))
+      // console.log(selected)
+      // console.log(selected.value)
+
+      // console.log(selected.value, ':', partyName, ':', bankName, ':', accNo, ':', ifsc)
     }
   }
 
@@ -81,25 +162,22 @@ export default function AddNewNeftBeautiful() {
     const updatedRows = [...billRows]
     updatedRows[index][field] = value
 
-    const { amount, discount, rd, tds } = updatedRows[index]
-    const a = parseFloat(amount) || 0
+    const { billAmount, discount, rd, tds } = updatedRows[index]
+    const a = parseFloat(billAmount) || 0
     const d = parseFloat(discount) || 0
     const r = parseFloat(rd) || 0
     const t = parseFloat(tds) || 0
 
-    updatedRows[index].finalAmount = a - d - r - t
+    updatedRows[index].netAmount = a - d - r - t
     setBillRows(updatedRows)
 
-    const totalA = updatedRows.reduce((sum, row) => sum + (parseFloat(row.finalAmount) || 0), 0)
-    const totalT = updatedRows.reduce((sum, row) => sum + (parseFloat(row.tds) || 0), 0)
-    setTotalNetAmount(totalA)
-    setTotalTdsAmount(totalT)
+    calculateTotals(updatedRows)
   }
 
   const handleAddRow = () => {
     setBillRows([
       ...billRows,
-      { billNo: '', date: '', amount: '', discount: '', rd: '', tds: '', finalAmount: '' },
+      { billNo: '', billDate: '', billAmount: '', discount: '', rd: '', tds: '', netAmount: '' },
     ])
   }
 
@@ -110,21 +188,18 @@ export default function AddNewNeftBeautiful() {
     setBillRows(updatedRows)
 
     // 🔁 Recalculate totals after delete
-    const totalA = updatedRows.reduce((sum, row) => sum + (parseFloat(row.finalAmount) || 0), 0)
-    const totalT = updatedRows.reduce((sum, row) => sum + (parseFloat(row.tds) || 0), 0)
-    setTotalNetAmount(totalA)
-    setTotalTdsAmount(totalT)
+    calculateTotals(updatedRows)
   }
 
   const handleRowReset = (index) => {
     const resetRow = {
       billNo: '',
-      date: '',
-      amount: '',
+      billDate: '',
+      billAmount: '',
       discount: '',
       rd: '',
       tds: '',
-      finalAmount: '',
+      netAmount: '',
     }
     const updatedRows = [...billRows]
     updatedRows[index] = resetRow
@@ -165,10 +240,12 @@ export default function AddNewNeftBeautiful() {
                     isSearchable
                     placeholder="Select or type party name"
                     classNamePrefix="select"
-                    onChange={(selected) => {
-                      setFormData((prev) => ({ ...prev, partyName: selected.value }))
-                      handlePartyChange({ target: { value: selected.value } })
-                    }}
+                    value={
+                      formData.partyId
+                        ? { value: formData.partyId, label: formData.partyName }
+                        : null
+                    }
+                    onChange={handlePartyChange}
                   />
                 </CCol>
               </CRow>
@@ -194,12 +271,7 @@ export default function AddNewNeftBeautiful() {
                   <label className="form-label mb-0">Account No</label>
                 </CCol>
                 <CCol>
-                  <CFormInput
-                    size="sm"
-                    value={formData.accountNo}
-                    readOnly
-                    placeholder="Account No"
-                  />
+                  <CFormInput size="sm" value={formData.accNo} readOnly placeholder="Account No" />
                 </CCol>
               </CRow>
 
@@ -209,12 +281,7 @@ export default function AddNewNeftBeautiful() {
                   <label className="form-label mb-0">IFSC Code</label>
                 </CCol>
                 <CCol>
-                  <CFormInput
-                    size="sm"
-                    value={formData.ifscCode}
-                    readOnly
-                    placeholder="IFSC Code"
-                  />
+                  <CFormInput size="sm" value={formData.ifsc} readOnly placeholder="IFSC Code" />
                 </CCol>
               </CRow>
             </CCol>
@@ -231,7 +298,9 @@ export default function AddNewNeftBeautiful() {
                     <small className="text-muted">NEFT No</small>
                   </CCol>
                   <CCol>
-                    <h4 className="fw-bold text-success mb-0">#{neftNo}</h4>
+                    <h4 className="fw-bold text-success mb-0">
+                      {urlNeftNo ? `#${neftNo}` : '⏳ Loading...'}
+                    </h4>
                   </CCol>
                 </CRow>
 
@@ -241,7 +310,7 @@ export default function AddNewNeftBeautiful() {
                     <small className="text-muted">Date</small>
                   </CCol>
                   <CCol>
-                    <h6 className="fw-semibold text-dark mb-0">{neftDate}</h6>
+                    <h6 className="fw-semibold text-dark mb-0">{formatDate(neftDate)}</h6>
                   </CCol>
                 </CRow>
 
@@ -264,7 +333,7 @@ export default function AddNewNeftBeautiful() {
                       color="dark"
                       size="sm"
                       className="w-100"
-                      onClick={() => navigate('/master/party-master')}
+                      onClick={() => navigate('/api/master/party')}
                     >
                       + Add Party
                     </CButton>
@@ -309,15 +378,15 @@ export default function AddNewNeftBeautiful() {
                   <CTableDataCell>
                     <CFormInput
                       type="date"
-                      value={row.date}
-                      onChange={(e) => handleRowChange(index, 'date', e.target.value)}
+                      value={row.billDate}
+                      onChange={(e) => handleRowChange(index, 'billDate', e.target.value)}
                     />
                   </CTableDataCell>
                   <CTableDataCell>
                     <CFormInput
-                      value={row.amount}
+                      value={row.billAmount}
                       placeholder="0"
-                      onChange={(e) => handleRowChange(index, 'amount', e.target.value)}
+                      onChange={(e) => handleRowChange(index, 'billAmount', e.target.value)}
                     />
                   </CTableDataCell>
                   <CTableDataCell>
@@ -342,7 +411,7 @@ export default function AddNewNeftBeautiful() {
                     />
                   </CTableDataCell>
                   <CTableDataCell>
-                    <CFormInput value={row.finalAmount} placeholder="0" disabled />
+                    <CFormInput value={row.netAmount} placeholder="0" disabled />
                   </CTableDataCell>
                   <CTableDataCell>
                     {billRows.length === 1 && index === 0 ? (
@@ -395,11 +464,13 @@ export default function AddNewNeftBeautiful() {
               <CCard className="bg-light p-3">
                 <CRow className="mb-2">
                   <CCol className="text-start">TDS Total:</CCol>
-                  <CCol className="text-end text-info fw-bold">₹ {totalTdsAmount}</CCol>
+                  <CCol className="text-end text-info fw-bold">₹ {tdsTotal}</CCol>
                 </CRow>
                 <CRow>
                   <CCol className="text-start">Total Amount:</CCol>
-                  <CCol className="text-end text-success fw-bold fs-4">₹ {totalNetAmount}</CCol>
+                  <CCol className="text-end text-success fw-bold fs-4">
+                    ₹ {totalPartyNeftAmount}
+                  </CCol>
                 </CRow>
               </CCard>
             </CCol>
@@ -424,12 +495,12 @@ export default function AddNewNeftBeautiful() {
         <ConfirmationModal
           isVisible={visible}
           setIsVisible={() => setVisible(false)}
-          neftCNo={neftNo}
+          neftNo={neftNo}
           neftDate={neftDate}
           formData={formData}
           billRows={billRows}
-          totalNetAmount={totalNetAmount}
-          totalTdsAmount={totalTdsAmount}
+          totalPartyNeftAmount={totalPartyNeftAmount}
+          tdsTotal={tdsTotal}
           remark={remark}
         />
       )}

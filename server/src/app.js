@@ -16,6 +16,8 @@ const greyOrderRoutes = require("./routes/grey/grey-order.routes");
 
 const neftRequestRoutes = require("./routes/neft/neft-request.routes");
 
+const pdfTestRoutes = require("./routes/neft/pdfTest.routes");
+
 // ⚙️ Import Services
 const HttpError = require("./utils/httpError");
 
@@ -51,16 +53,19 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
 
 // Master Routes
-app.use("/api/master/items", itemRoutes);
-app.use("/api/master/agents", agentsRotes);
+app.use("/api/master/item", itemRoutes);
+app.use("/api/master/agent", agentsRotes);
 app.use("/api/master/party", partyRoutes);
-app.use("/api/master/mills", millRoutes);
+app.use("/api/master/mill", millRoutes);
 
 // Grey Order Routes
 app.use("/api/grey-orders", greyOrderRoutes);
 
 // NEFT Routes
 app.use("/api/neft-request", neftRequestRoutes);
+
+// PDF Test Route
+app.use("/api/pdf", pdfTestRoutes);
 
 // Fallback for undefined routes
 app.use((req, res, next) => {

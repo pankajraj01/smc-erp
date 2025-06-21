@@ -112,7 +112,7 @@ const updatedAgent = async (req, res, next) => {
     if (type) agent.type = type;
     if (bank) {
       if (bank.bankName) agent.bank.bankName = bank.bankName;
-      if (bank.accountNo) agent.bank.accountNo = bank.accountNo;
+      if (bank.accNo) agent.bank.accNo = bank.accNo;
       if (bank.ifsc) agent.bank.ifsc = bank.ifsc;
     }
 

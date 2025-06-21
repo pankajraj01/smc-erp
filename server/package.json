@@ -17,6 +17,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.15.1",
     "mongoose-unique-validator": "^4.0.1",
+    "pdfmake": "^0.2.20",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
