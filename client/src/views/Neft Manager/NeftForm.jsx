@@ -26,9 +26,10 @@ export default function NeftForm({
   neftDate,
   totalPartyNeftAmount,
   tdsTotal,
-  remark,
-  setRemark,
+  partyRemark,
+  setPartyRemark,
   calculateTotals,
+  neftStatus,
   onSave,
   onCancel,
 }) {
@@ -134,8 +135,20 @@ export default function NeftForm({
                     <small className="text-muted">Status</small>
                   </CCol>
                   <CCol>
-                    <CBadge color="warning" className="px-3 py-1">
-                      Pending
+                    <CBadge
+                      color={
+                        neftStatus === 'Paid'
+                          ? 'success'
+                          : neftStatus === 'Partial'
+                            ? 'info'
+                            : neftStatus === 'Cancelled'
+                              ? 'secondary'
+                              : 'warning'
+                      }
+                      className="px-3 py-1 cursor-pointer"
+                      // onClick={handleNeftStatusToggle}
+                    >
+                      {neftStatus}
                     </CBadge>
                   </CCol>
                 </CRow>
@@ -155,13 +168,13 @@ export default function NeftForm({
             <CCol md={8}>
               <CFormTextarea
                 rows={3}
-                value={remark}
-                placeholder="📝 Add any remarks here..."
-                onChange={(e) => setRemark(e.target.value)}
+                value={partyRemark}
+                placeholder="📝 Add any remarks for Party here..."
+                onChange={(e) => setPartyRemark(e.target.value)}
               />
             </CCol>
             <CCol>
-              <CCard className="bg-light p-3">
+              <CCard className="bg-light px-3 py-2">
                 <CRow className="mb-2">
                   <CCol className="text-start">TDS Total:</CCol>
                   <CCol className="text-end text-info fw-bold">₹ {tdsTotal}</CCol>

@@ -5,7 +5,7 @@ const HttpError = require("../../utils/httpError");
 // 🔹 Create New NEFT Request
 const createNeftRequest = async (req, res, next) => {
   try {
-    const { neftAmount, neftDate, remark, parties } = req.body;
+    const { neftAmount, neftDate, neftRemark, parties } = req.body;
 
     // ✅ Basic validation
     if (!neftAmount || !parties || !Array.isArray(parties)) {
@@ -21,7 +21,7 @@ const createNeftRequest = async (req, res, next) => {
       neftNo: nextNeftNo,
       neftAmount,
       neftDate: new Date(neftDate), // ensure it's a Date object
-      remark,
+      neftRemark,
       parties,
       // createdBy: req.userId // optional auth
     });
@@ -60,6 +60,25 @@ const getSingleNeftRequest = async (req, res, next) => {
     res.status(200).json({ neft });
   } catch (err) {
     return next(new HttpError("Fetching NEFT failed", 500));
+  }
+};
+
+// Update Neft Remark
+const updateNeftRemark = async (req, res) => {
+  try {
+    const { remark } = req.body;
+    const { neftId } = req.params;
+
+    const neft = await NeftRequest.findById(neftId);
+    if (!neft) return res.status(404).json({ message: "NEFT not found" });
+
+    neft.neftRemark = remark || "";
+    await neft.save();
+
+    res.status(200).json({ message: "NEFT remark updated", neft });
+  } catch (err) {
+    console.error("Remark update error:", err);
+    res.status(500).json({ message: "Failed to update NEFT remark" });
   }
 };
 
@@ -113,7 +132,7 @@ const updatePartyInNeft = async (req, res) => {
     party.partyId = updatedParty.partyId;
     party.partyName = updatedParty.partyName;
     party.bank = updatedParty.bank;
-    party.remark = updatedParty.remark;
+    party.partyRemark = updatedParty.partyRemark;
     party.totalPartyNeftAmount = updatedParty.totalPartyNeftAmount;
     party.tdsTotal = updatedParty.tdsTotal;
     party.partyNeftStatus = updatedParty.partyNeftStatus || "Pending";
@@ -125,11 +144,11 @@ const updatePartyInNeft = async (req, res) => {
       0
     );
 
-    console.log("🆔 Searching for partyId:", partyId);
-    console.log("Found at index:", partyIndex);
-    console.log("Original Party:", neft.parties[partyIndex]);
-    console.log("Incoming Update:", updatedParty);
-    console.log("📦 Updated Bills:", party.bills);
+    // console.log("🆔 Searching for partyId:", partyId);
+    // console.log("Found at index:", partyIndex);
+    // console.log("Original Party:", neft.parties[partyIndex]);
+    // console.log("Incoming Update:", updatedParty);
+    // console.log("📦 Updated Bills:", party.bills);
     // console.log(
     //   "🧾 Before Save:",
     //   JSON.stringify(neft.parties[partyIndex], null, 2)
@@ -211,14 +230,43 @@ const updatePartyStatus = async (req, res) => {
   }
 };
 
+// 🔹 Get all NEFTs of a specific Party
+const getNeftsByParty = async (req, res) => {
+  try {
+    const { partyId } = req.params;
+
+    const nefts = await NeftRequest.find({
+      parties: { $elemMatch: { partyId } },
+    }).sort({ neftNo: -1 });
+
+    const filtered = nefts.map((neft) => {
+      const party = neft.parties.find((p) => p.partyId?.toString() === partyId);
+      return {
+        neftId: neft._id,
+        neftNo: neft.neftNo,
+        neftDate: neft.neftDate,
+        partyNeftStatus: party.partyNeftStatus || "Pending",
+        totalPartyNeftAmount: party.totalPartyNeftAmount || 0,
+      };
+    });
+
+    res.status(200).json({ partyNefts: filtered });
+  } catch (err) {
+    console.error("Error fetching party NEFTs:", err);
+    res.status(500).json({ message: "Failed to fetch party NEFTs" });
+  }
+};
+
 // 🔸 Export All Functions
 module.exports = {
   createNeftRequest,
   getAllNeftRequests,
   getSingleNeftRequest,
+  updateNeftRemark,
   addPartyToNeft,
   updatePartyInNeft,
   deletePartyFromNeft,
   updatePartyStatus,
   updateNeftStatus,
+  getNeftsByParty,
 };

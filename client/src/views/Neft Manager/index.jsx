@@ -9,7 +9,7 @@ import {
   createNewNeft,
   addPartyToNeft,
   updatePartyInNeft,
-} from './neftAPi'
+} from './neftApi'
 import NeftForm from './NeftForm'
 import ConfirmationModal from './ConfirmationModal'
 
@@ -25,6 +25,8 @@ export default function CreateNeftPage() {
 
   const [neftNo, setNeftNo] = useState(null)
   const [neftDate, setNeftDate] = useState(new Date().toISOString().split('T')[0])
+  const [neftRemark, setNeftRemark] = useState('')
+  const [neftStatus, setNeftStatus] = useState('Pending')
   const [parties, setParties] = useState([])
   const [formData, setFormData] = useState({
     partyId: '',
@@ -38,7 +40,7 @@ export default function CreateNeftPage() {
   ])
   const [totalPartyNeftAmount, setTotalPartyNeftAmount] = useState(0)
   const [tdsTotal, setTdsTotal] = useState(0)
-  const [remark, setRemark] = useState('')
+  const [partyRemark, setPartyRemark] = useState('')
 
   useEffect(() => {
     fetchAllParties().then((data) => setParties(data || []))
@@ -55,6 +57,8 @@ export default function CreateNeftPage() {
         const neft = await fetchNeftById(neftId)
         setNeftNo(neft.neftNo)
         setNeftDate(neft.neftDate)
+        setNeftRemark(neft.neftRemark)
+        setNeftStatus(neft.neftStatus)
 
         if (isEditParty) {
           const neft = await fetchNeftById(neftId)
@@ -74,7 +78,7 @@ export default function CreateNeftPage() {
               ifsc: party.bank.ifsc,
             })
             setBillRows(party.bills)
-            setRemark(party.remark)
+            setPartyRemark(party.partyRemark)
             calculateTotals(party.bills)
           }
         }
@@ -94,6 +98,7 @@ export default function CreateNeftPage() {
     const partyPayload = {
       partyId: formData.partyId,
       partyName: formData.partyName,
+      partyRemark,
       bank: {
         bankName: formData.bankName,
         accNo: formData.accNo,
@@ -102,7 +107,7 @@ export default function CreateNeftPage() {
       bills: billRows,
       totalPartyNeftAmount,
       tdsTotal,
-      remark,
+      neftRemark,
       partyStatus: 'Pending',
     }
 
@@ -111,8 +116,8 @@ export default function CreateNeftPage() {
       neftDate: new Date(neftDate),
       neftAmount: totalPartyNeftAmount,
       tdsTotal,
-      neftStatus: 'Pending',
-      remark,
+      neftStatus,
+      neftRemark,
       parties: [partyPayload], // single party wrapped
     }
 
@@ -148,8 +153,9 @@ export default function CreateNeftPage() {
         neftDate={neftDate}
         totalPartyNeftAmount={totalPartyNeftAmount}
         tdsTotal={tdsTotal}
-        remark={remark}
-        setRemark={setRemark}
+        neftStatus={neftStatus}
+        partyRemark={partyRemark}
+        setPartyRemark={setPartyRemark}
         calculateTotals={calculateTotals}
         onSave={() => setVisible(true)}
         onCancel={() => navigate(-1)}
@@ -165,7 +171,7 @@ export default function CreateNeftPage() {
           billRows={billRows}
           totalPartyNeftAmount={totalPartyNeftAmount}
           tdsTotal={tdsTotal}
-          remark={remark}
+          partyRemark={partyRemark}
           onFinalSave={handleFinalSubmit}
         />
       )}

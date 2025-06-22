@@ -65,7 +65,7 @@ app.use("/api/grey-orders", greyOrderRoutes);
 app.use("/api/neft-request", neftRequestRoutes);
 
 // PDF Test Route
-app.use("/api/pdf", pdfTestRoutes);
+app.use("/api/neft/pdf", pdfTestRoutes);
 
 // Fallback for undefined routes
 app.use((req, res, next) => {

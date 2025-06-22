@@ -1,6 +1,16 @@
-import { CButton, CCard, CCardBody, CCardHeader, CContainer, CFormInput } from '@coreui/react'
+import {
+  CButton,
+  CButtonGroup,
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CContainer,
+  CFormInput,
+  CFormSelect,
+} from '@coreui/react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { FileSignature } from 'lucide-react'
 
 import NeftTable from './NeftTable'
 import PaginationControls from '../../components/PaginationControls'
@@ -14,6 +24,7 @@ export default function NeftManager() {
   const [currentPage, setCurrentPage] = useState(1)
   const [neftPageVisible, setNeftPageVisible] = useState(false)
   const [selectedNeft, setSelectedNeft] = useState(null)
+  const [statusFilter, setStatusFilter] = useState('ALL')
 
   const navigate = useNavigate()
 
@@ -33,27 +44,23 @@ export default function NeftManager() {
     fetchNefts()
   }, [])
 
-  // 🔍 Search Logic
-  const filteredNefts = nefts.filter((neft) => {
-    const term = searchTerm.trim().toLowerCase()
-    return (
-      neft.neftNo.toString().includes(term) ||
-      neft.neftDate?.toLowerCase().includes(term) ||
-      neft.neftStatus?.toLowerCase().includes(term)
-    )
-  })
+  // 🔍 Search Logic + Status Filter Logic
+  const filteredNefts = nefts
+    .filter((neft) => {
+      const term = searchTerm.trim().toLowerCase()
+      return (
+        neft.neftNo.toString().includes(term) ||
+        neft.neftDate?.toLowerCase().includes(term) ||
+        neft.neftStatus?.toLowerCase().includes(term)
+      )
+    })
+    .filter((neft) => statusFilter === 'ALL' || neft.neftStatus === statusFilter)
 
   // ✅ Paginate filtered data
   const paginatedNefts = filteredNefts.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   )
-
-  // 👁️ Modal trigger
-  // const handleViewNeft = (neftNo) => {
-  //   setSelectedNeft(neftNo)
-  //   setNeftPageVisible(true)
-  // }
 
   return (
     <CCard className="shadow-sm">
@@ -75,11 +82,38 @@ export default function NeftManager() {
             />
           </CContainer>
           <CContainer className="col-md-8 text-md-end">
-            <CButton color="secondary" className="me-2">
-              <i className="bi bi-funnel"></i> Filter
+            <CFormSelect
+              className="form-select d-inline-block w-auto me-2"
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value)
+                setCurrentPage(1)
+              }}
+            >
+              <option value="ALL">All Status</option>
+              <option value="Pending">Pending</option>
+              <option value="Paid">Paid</option>
+              <option value="Partial">Partial</option>
+              <option value="Cancelled">Cancelled</option>
+            </CFormSelect>
+
+            <CButton
+              color="light"
+              size="sm"
+              className="border border-info"
+              onClick={() => navigate('/api/neft-manager/neft-party-center')}
+            >
+              Party Wise Nefts
             </CButton>
-            <CButton color="success" onClick={() => navigate('/api/neft-manager/create')}>
-              + Create New NEFT
+
+            <CButton
+              color="success"
+              size="sm"
+              className="border border-info ms-2"
+              onClick={() => navigate('/api/neft-manager/create')}
+            >
+              <FileSignature size={16} className="me-2" />
+              <span>Create New Neft</span>
             </CButton>
           </CContainer>
         </CContainer>

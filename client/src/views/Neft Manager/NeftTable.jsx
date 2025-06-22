@@ -10,10 +10,15 @@ import {
 } from '@coreui/react'
 import formatDate from '../../utils/formatDate'
 import { useNavigate } from 'react-router-dom'
+import { FileSignature, FileText } from 'lucide-react'
 
 export default function NeftTable({ nefts, refreshNefts }) {
   const navigate = useNavigate()
   const statusCycle = ['Pending', 'Paid', 'Partial', 'Cancelled']
+  const handleViewPdf = (neftId) => {
+    const url = `http://localhost:5000/api/neft/pdf/${neftId}`
+    window.open(url, '_blank')
+  }
 
   const handleNeftStatusToggle = async (neftId, currentStatus) => {
     const nextStatus = statusCycle[(statusCycle.indexOf(currentStatus) + 1) % statusCycle.length]
@@ -44,11 +49,10 @@ export default function NeftTable({ nefts, refreshNefts }) {
         <CTableRow>
           <CTableHeaderCell>Neft No</CTableHeaderCell>
           <CTableHeaderCell>Date</CTableHeaderCell>
-          <CTableHeaderCell>Neft Count</CTableHeaderCell>
+          <CTableHeaderCell>Party Count</CTableHeaderCell>
           <CTableHeaderCell>Total Amount</CTableHeaderCell>
           <CTableHeaderCell>Status</CTableHeaderCell>
-          <CTableHeaderCell>SMC PDF</CTableHeaderCell>
-          <CTableHeaderCell>Pali PDF</CTableHeaderCell>
+          <CTableHeaderCell>PDF</CTableHeaderCell>
         </CTableRow>
       </CTableHead>
       <CTableBody>
@@ -86,14 +90,16 @@ export default function NeftTable({ nefts, refreshNefts }) {
                 {neft.neftStatus}
               </CBadge>
             </CTableDataCell>
-            <CTableDataCell>
-              <CButton size="sm" color="info">
-                SMC PDF
-              </CButton>
-            </CTableDataCell>
-            <CTableDataCell>
-              <CButton size="sm" color="warning">
-                PALI PDF
+            <CTableDataCell className="">
+              <CButton
+                size="sm"
+                color="light"
+                className="border border-info text-info"
+                onClick={() => handleViewPdf(neft._id)}
+                title="Download NEFT PDF"
+              >
+                <FileText size={16} />
+                {/* <span className="fw-medium ms-1">PDF</span> */}
               </CButton>
             </CTableDataCell>
           </CTableRow>

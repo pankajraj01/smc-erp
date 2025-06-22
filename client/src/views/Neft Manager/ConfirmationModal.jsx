@@ -30,7 +30,7 @@ export default function ConfirmationModal({
   billRows,
   totalPartyNeftAmount,
   tdsTotal,
-  remark,
+  partyRemark,
   onFinalSave,
 }) {
   return (
@@ -163,8 +163,8 @@ export default function ConfirmationModal({
           <CCardBody>
             <CRow>
               <CCol md={8}>
-                <h6 className="text-muted">Remark:</h6>
-                <p className="border p-3 bg-light rounded">{remark}</p>
+                <h6 className="text-muted">Party Remark:</h6>
+                <p className="border p-3 bg-light rounded">{partyRemark || '-'}</p>
               </CCol>
               <CCol>
                 <CCard className="bg-light p-3">

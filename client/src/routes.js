@@ -21,9 +21,10 @@ const AgentMaster = React.lazy(() => import('./views/Master/Agent Master/AgentMa
 
 // Neft Manager
 const NeftManager = React.lazy(() => import('./views/Neft Manager/NeftManager'))
-// const CreateNewNeft = React.lazy(() => import('./views/Neft Manager/CreateNewNeft'))
 const CreateNewNeft = React.lazy(() => import('./views/Neft Manager/index'))
 const NeftPage = React.lazy(() => import('./views/Neft Manager/NeftPage'))
+const NeftPartyCenter = React.lazy(() => import('./views/Neft Manager/NeftPartyCenter'))
+const PartyNeftList = React.lazy(() => import('./views/Neft Manager/PartyNeftList'))
 
 // const Breadcrumbs = React.lazy(() => import('./views/base/breadcrumbs/Breadcrumbs'))
 
@@ -53,7 +54,19 @@ const routes = [
     name: 'Create New Neft',
     element: CreateNewNeft,
   }, // edit/update data
+
   { path: '/api/neft-manager/:neftId', name: 'Neft Page', element: NeftPage }, // view single neft
+
+  {
+    path: '/api/neft-manager/neft-party-center',
+    name: 'Neft Party Center',
+    element: NeftPartyCenter,
+  }, // view party wise neft
+  {
+    path: '/api/neft-manager/neft-party/:partyId',
+    name: 'Neft Party Center',
+    element: PartyNeftList,
+  },
 
   { path: '/base/accordion', name: 'Accordion', element: Accordion },
 

@@ -7,6 +7,7 @@ import {
   CCol,
   CContainer,
   CFormInput,
+  CFormSelect,
   CRow,
   CTable,
   CTableBody,
@@ -22,6 +23,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import PaginationControls from '../../components/PaginationControls'
 import formatDate from '../../utils/formatDate'
 import ConfirmDeleteModal from './ConfirmDeleteModal'
+import { FileSignature, FileText, FileTextIcon, PencilIcon, Trash2Icon } from 'lucide-react'
 
 export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
   const ITEMS_PER_PAGE = 5
@@ -33,8 +35,16 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
   const [partyList, setPartyList] = useState([]) // Initialize as empty array for select party
   const [deleteModalVisible, setDeleteModalVisible] = useState(false)
   const [partyToDelete, setPartyToDelete] = useState(null)
+  const [editMode, setEditMode] = useState(false)
+  const [remarkInput, setRemarkInput] = useState('')
+  const [statusFilter, setStatusFilter] = useState('ALL')
 
   const statusCycle = ['Pending', 'Paid', 'Partial', 'Cancelled']
+
+  const handleDownloadPartyPdf = (neftId, partyId) => {
+    const url = `http://localhost:5000/api/neft/pdf/${neftId}/party/${partyId}`
+    window.open(url, '_blank')
+  }
 
   useEffect(() => {
     if (!neftId) return
@@ -53,6 +63,27 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
 
     fetchNeft()
   }, [neftId])
+
+  const handleSaveRemark = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/neft-request/${neftId}/remark`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ remark: remarkInput }),
+      })
+
+      const data = await res.json()
+      if (res.ok) {
+        setNeftDetails((prev) => ({ ...prev, neftRemark: remarkInput }))
+        setEditMode(false)
+      } else {
+        alert(data.message || 'Failed to update remark')
+      }
+    } catch (err) {
+      console.error('Error updating remark:', err)
+      alert('Error updating remark')
+    }
+  }
 
   const handleNeftStatusToggle = async () => {
     const currentStatus = neftDetails.neftStatus || 'Pending'
@@ -103,10 +134,11 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
     }
   }
 
-  // ✅ Paginate filtered data
-  const allParties = partyList.filter((party) =>
-    party.partyName.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  // 🔍 Search Logic + Status Filter Logic
+
+  const allParties = partyList
+    .filter((party) => party.partyName.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter((party) => statusFilter === 'ALL' || party.partyNeftStatus === statusFilter)
 
   const paginatedParties = allParties.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -165,6 +197,46 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
                 </CBadge>
               </CCol>
             </CRow>
+            <CRow>
+              <CCol md={12} className="mt-4">
+                <h6 className="text-muted mb-1">Remark</h6>
+
+                {editMode ? (
+                  <div className="d-flex align-items-center gap-2">
+                    <CFormInput
+                      type="text"
+                      value={remarkInput}
+                      onChange={(e) => setRemarkInput(e.target.value)}
+                      className="me-2"
+                      placeholder="Enter NEFT remark"
+                    />
+                    <CButton color="success" size="sm" onClick={handleSaveRemark}>
+                      Save
+                    </CButton>
+                    <CButton color="danger" size="sm" onClick={() => setEditMode(false)}>
+                      Cancel
+                    </CButton>
+                  </div>
+                ) : (
+                  <div className="d-flex align-items-center justify-content-between">
+                    <h6 className="fw-semibold mb-0 text-dark">
+                      {neftDetails.neftRemark || 'No remark added'}
+                    </h6>
+                    <CButton
+                      color="secondary"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setEditMode(true)
+                        setRemarkInput(neftDetails.neftRemark || '')
+                      }}
+                    >
+                      Edit
+                    </CButton>
+                  </div>
+                )}
+              </CCol>
+            </CRow>
           </CCardBody>
         </CCard>
 
@@ -182,6 +254,20 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
             />
           </CCol>
           <CCol md={8} className="text-end">
+            <CFormSelect
+              className="form-select d-inline-block w-auto me-2"
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value)
+                setCurrentPage(1)
+              }}
+            >
+              <option value="ALL">All Status</option>
+              <option value="Pending">Pending</option>
+              <option value="Paid">Paid</option>
+              <option value="Partial">Partial</option>
+              <option value="Cancelled">Cancelled</option>
+            </CFormSelect>
             <CButton color="primary" onClick={() => navigate(`/api/neft-manager/create/${neftId}`)}>
               + Add More Party
             </CButton>
@@ -196,8 +282,7 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
               <CTableHeaderCell>Status</CTableHeaderCell>
               <CTableHeaderCell>Bill Count</CTableHeaderCell>
               <CTableHeaderCell>Total Amount</CTableHeaderCell>
-              <CTableHeaderCell>SMC Pdf</CTableHeaderCell>
-              <CTableHeaderCell>Pali Pdf</CTableHeaderCell>
+              <CTableHeaderCell>Pdf</CTableHeaderCell>
               <CTableHeaderCell>Edit</CTableHeaderCell>
               <CTableHeaderCell>Delete</CTableHeaderCell>
             </CTableRow>
@@ -228,33 +313,45 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
                 <CTableDataCell>{party.bills?.length || 0}</CTableDataCell>
                 <CTableDataCell>₹ {party.totalPartyNeftAmount}</CTableDataCell>
                 <CTableDataCell>
-                  <CButton color="info" size="sm">
-                    SMC PDF
+                  <CButton
+                    size="sm"
+                    color="light"
+                    className="border border-info text-info"
+                    onClick={() =>
+                      handleDownloadPartyPdf(
+                        neftId,
+                        typeof party.partyId === 'object' ? party.partyId._id : party.partyId,
+                      )
+                    }
+                  >
+                    <FileTextIcon size={16} />
                   </CButton>
                 </CTableDataCell>
+
                 <CTableDataCell>
-                  <CButton color="warning" size="sm">
-                    PALI PDF
-                  </CButton>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <CIcon
-                    icon={cilPencil}
-                    className="text-primary cursor-pointer"
+                  <CButton
+                    size="sm"
+                    color="light"
+                    className="border border-info text-info"
                     onClick={() =>
                       navigate(`/api/neft-manager/create/${neftId}/party/${party.partyId}`)
                     }
-                  />
+                  >
+                    <PencilIcon size={16} />
+                  </CButton>
                 </CTableDataCell>
                 <CTableDataCell>
-                  <CIcon
-                    icon={cilTrash}
-                    className="text-danger cursor-pointer"
+                  <CButton
+                    size="sm"
+                    color="light"
+                    className="border border-info text-info"
                     onClick={() => {
                       setPartyToDelete(party)
                       setDeleteModalVisible(true)
                     }}
-                  />
+                  >
+                    <Trash2Icon size={16} />
+                  </CButton>
                 </CTableDataCell>
               </CTableRow>
             ))}
