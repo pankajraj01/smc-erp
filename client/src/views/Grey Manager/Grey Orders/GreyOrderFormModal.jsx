@@ -130,7 +130,7 @@ export default function GreyOrderFormModal({ isVisible, setIsVisible, onSubmit, 
                 isSearchable
                 placeholder="Select or search agent..."
               />
-              <CButton size="sm" color="link" className="px-0 mt-1">
+              <CButton size="sm" color="info"  className="rounded-pill mt-2">
                 + Add New Agent
               </CButton>
             </CCol>
@@ -151,7 +151,7 @@ export default function GreyOrderFormModal({ isVisible, setIsVisible, onSubmit, 
                 isSearchable
                 placeholder="Select or search item..."
               />
-              <CButton size="sm" color="link" className="px-0 mt-1">
+              <CButton size="sm" color="info" className="rounded-pill mt-2">
                 + Add New Item
               </CButton>
             </CCol>
