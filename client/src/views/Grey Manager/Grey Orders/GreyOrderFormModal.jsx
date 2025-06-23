@@ -14,6 +14,8 @@ import {
 } from '@coreui/react'
 import { useState, useEffect, useRef } from 'react'
 import Select from 'react-select'
+import AgentFormModal from '../../Master/Agent Master/AgentFormModal'
+
 
 export default function GreyOrderFormModal({ isVisible, setIsVisible, onSubmit, initialData }) {
   const [formData, setFormData] = useState({
@@ -29,6 +31,7 @@ export default function GreyOrderFormModal({ isVisible, setIsVisible, onSubmit, 
   const [agents, setAgents] = useState([])
   const [items, setItems] = useState([])
   const [orderNo, setOrderNo] = useState('')
+  const [showAgentModal, setShowAgentModal] = useState(false);
   const agentSelectRef = useRef(null)
 
   useEffect(() => {
@@ -86,6 +89,7 @@ export default function GreyOrderFormModal({ isVisible, setIsVisible, onSubmit, 
   }
 
   return (
+    <>
     <CModal visible={isVisible} onClose={() => setIsVisible(false)} backdrop="static" size="lg">
       <CModalHeader className="bg-primary text-white">
         <CModalTitle>{initialData ? 'Edit Grey Order' : 'New Grey Order'}</CModalTitle>
@@ -130,7 +134,12 @@ export default function GreyOrderFormModal({ isVisible, setIsVisible, onSubmit, 
                 isSearchable
                 placeholder="Select or search agent..."
               />
-              <CButton size="sm" color="info"  className="rounded-pill mt-2">
+              <CButton
+                size="sm"
+                color="info"
+                className="rounded-pill mt-2"
+                onClick={() => setShowAgentModal(true)} // show agent modal
+              >
                 + Add New Agent
               </CButton>
             </CCol>
@@ -209,6 +218,9 @@ export default function GreyOrderFormModal({ isVisible, setIsVisible, onSubmit, 
           Cancel
         </CButton>
       </CModalFooter>
+      <AgentFormModal isVisible={showAgentModal} setIsVisible={setShowAgentModal} />
     </CModal>
+    <AgentFormModal isVisible={showAgentModal} setIsVisible={setShowAgentModal} />
+  </>
   )
 }
