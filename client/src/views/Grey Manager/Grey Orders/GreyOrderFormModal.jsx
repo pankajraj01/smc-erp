@@ -15,6 +15,7 @@ import {
 import { useState, useEffect, useRef } from 'react'
 import Select from 'react-select'
 import AgentFormModal from '../../Master/Agent Master/AgentFormModal'
+import ItemFormModal from '../../Master/Item Master/ItemFormModal'
 
 
 export default function GreyOrderFormModal({ isVisible, setIsVisible, onSubmit, initialData }) {
@@ -33,6 +34,8 @@ export default function GreyOrderFormModal({ isVisible, setIsVisible, onSubmit, 
   const [orderNo, setOrderNo] = useState('')
   const [showAgentModal, setShowAgentModal] = useState(false);
   const agentSelectRef = useRef(null)
+  const [showItemModal, setShowItemModal] = useState(false); // For Add Item
+
 
   useEffect(() => {
     fetch('http://localhost:5000/api/master/agents')
@@ -160,9 +163,15 @@ export default function GreyOrderFormModal({ isVisible, setIsVisible, onSubmit, 
                 isSearchable
                 placeholder="Select or search item..."
               />
-              <CButton size="sm" color="info" className="rounded-pill mt-2">
-                + Add New Item
-              </CButton>
+                <CButton
+                  size="sm"
+                  color="info"
+                  className="rounded-pill mt-2"
+                  onClick={() => setShowItemModal(true)} // open item modal
+                >
+                  + Add New Item
+                </CButton>
+
             </CCol>
           </CRow>
 
@@ -221,6 +230,7 @@ export default function GreyOrderFormModal({ isVisible, setIsVisible, onSubmit, 
       <AgentFormModal isVisible={showAgentModal} setIsVisible={setShowAgentModal} />
     </CModal>
     <AgentFormModal isVisible={showAgentModal} setIsVisible={setShowAgentModal} />
+    <ItemFormModal isVisible={showItemModal} setIsVisible={setShowItemModal} />
   </>
   )
 }
