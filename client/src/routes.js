@@ -21,7 +21,10 @@ const AgentMaster = React.lazy(() => import('./views/Master/Agent Master/AgentMa
 
 // Neft Manager
 const NeftManager = React.lazy(() => import('./views/Neft Manager/NeftManager'))
-const AddNewNeft = React.lazy(() => import('./views/Neft Manager/AddNewNeft'))
+const CreateNewNeft = React.lazy(() => import('./views/Neft Manager/index'))
+const NeftPage = React.lazy(() => import('./views/Neft Manager/NeftPage'))
+const NeftPartyCenter = React.lazy(() => import('./views/Neft Manager/NeftPartyCenter'))
+const PartyNeftList = React.lazy(() => import('./views/Neft Manager/PartyNeftList'))
 
 // const Breadcrumbs = React.lazy(() => import('./views/base/breadcrumbs/Breadcrumbs'))
 
@@ -33,18 +36,37 @@ const routes = [
   { path: '/login', name: 'Login', element: Login },
 
   // Grey Manager
-  { path: '/api/grey-orders', name: 'Grey Orders', element: GreyOrders },
+  { path: '/grey-orders', name: 'Grey Orders', element: GreyOrders },
   { path: '/grey-received', name: 'Grey Received', element: GreyReceived },
 
   // Master
-  { path: '/api/master/items', name: 'Item Master', element: ItemMaster },
-  { path: '/api/master/parties', name: 'Party Master', element: PartyMaster },
-  { path: '/api/master/mills', name: 'Mill Master', element: MillMaster },
-  { path: '/api/master/agents', name: 'Agent Master', element: AgentMaster },
+  { path: '/master/item', name: 'Item Master', element: ItemMaster },
+  { path: '/master/party', name: 'Party Master', element: PartyMaster },
+  { path: '/master/mill', name: 'Mill Master', element: MillMaster },
+  { path: '/master/agent', name: 'Agent Master', element: AgentMaster },
 
   // Neft Manager
   { path: '/neft-manager', name: 'Neft Manager', element: NeftManager },
-  { path: '/add-new-neft', name: 'Add New Neft', element: AddNewNeft },
+  { path: '/neft-manager/create', name: 'Create New Neft', element: CreateNewNeft }, // add new
+  { path: '/neft-manager/add-party/:neftId', name: 'Add Party', element: CreateNewNeft }, // add party to neft
+  {
+    path: '/neft-manager/create/:neftId/party/:partyId',
+    name: 'Create New Neft',
+    element: CreateNewNeft,
+  }, // edit/update data
+
+  { path: '/neft-manager/:neftId', name: 'View Neft', element: NeftPage }, // view single neft
+
+  {
+    path: '/neft-manager/neft-party-center',
+    name: 'Neft Party Center',
+    element: NeftPartyCenter,
+  }, // view party wise neft
+  {
+    path: '/neft-manager/neft-party/:partyId',
+    name: 'Neft Party Center',
+    element: PartyNeftList,
+  },
 
   { path: '/base/accordion', name: 'Accordion', element: Accordion },
 

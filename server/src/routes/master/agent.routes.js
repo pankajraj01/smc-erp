@@ -19,7 +19,7 @@ router.post(
     check("agentName").not().isEmpty(),
     check("type").not().isEmpty(),
     body("bank.bankName").notEmpty().withMessage("Bank Name is Required"),
-    body("bank.accountNo")
+    body("bank.accNo")
       .isLength({ min: 10, max: 16 })
       .withMessage("Account number must be 10 to 16 digits")
       .matches(/^\d+$/)
@@ -38,7 +38,7 @@ router.patch(
     check("agentName").not().isEmpty(),
     check("type").not().isEmpty(),
     body("bank.bankName").notEmpty().withMessage("Bank Name is Required"),
-    body("bank.accountNo")
+    body("bank.accNo")
       .isLength({ min: 10, max: 16 })
       .withMessage("Account number must be 10 to 16 digits")
       .matches(/^\d+$/)

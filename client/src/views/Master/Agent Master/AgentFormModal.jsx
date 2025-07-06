@@ -18,7 +18,7 @@ export default function AgentFormModal({ isVisible, setIsVisible, onSubmit, init
   const emptyForm = {
     agentName: '',
     type: 'GREY',
-    bank: { bankName: '', accountNo: '', ifsc: '' },
+    bank: { bankName: '', accNo: '', ifsc: '' },
   }
 
   const [formData, setFormData] = useState(emptyForm)
@@ -30,7 +30,7 @@ export default function AgentFormModal({ isVisible, setIsVisible, onSubmit, init
 
   // Unified input handler (including nested `bank` fields)
   const handleChange = ({ target: { name, value } }) => {
-    if (['bankName', 'accountNo', 'ifsc'].includes(name)) {
+    if (['bankName', 'accNo', 'ifsc'].includes(name)) {
       setFormData((prev) => ({
         ...prev,
         bank: { ...prev.bank, [name]: value.toUpperCase() },
@@ -62,7 +62,7 @@ export default function AgentFormModal({ isVisible, setIsVisible, onSubmit, init
           {[
             { label: 'Agent Name', name: 'agentName', value: formData.agentName },
             { label: 'Bank Name', name: 'bankName', value: formData.bank.bankName },
-            { label: 'Account No.', name: 'accountNo', value: formData.bank.accountNo },
+            { label: 'Account No.', name: 'accNo', value: formData.bank.accNo },
             { label: 'IFSC', name: 'ifsc', value: formData.bank.ifsc },
           ].map(({ label, name, value }) => (
             <CRow className="mb-3" key={name}>

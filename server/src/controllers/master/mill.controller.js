@@ -101,7 +101,7 @@ const updatedMill = async (req, res, next) => {
 
     if (bank) {
       if (bank.bankName) mill.bank.bankName = bank.bankName;
-      if (bank.accountNo) mill.bank.accountNo = bank.accountNo;
+      if (bank.accNo) mill.bank.accNo = bank.accNo;
       if (bank.ifsc) mill.bank.ifsc = bank.ifsc;
     }
 

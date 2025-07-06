@@ -32,7 +32,7 @@ const PartyNeftSchema = Schema({
   },
   tdsTotal: { type: Number, default: 0 },
   totalPartyNeftAmount: { type: Number, required: true },
-  remark: { type: String, default: "-" },
+  partyRemark: { type: String, default: "-" },
   bills: { type: [BillSchema], default: [] },
 });
 
@@ -47,7 +47,7 @@ const NeftRequestSchema = Schema(
       enum: ["Pending", "Sent", "Partial", "Paid", "Cancelled"],
       default: "Pending",
     },
-    remark: { type: String, default: "-" },
+    neftRemark: { type: String, default: "-" },
     parties: { type: [PartyNeftSchema], default: [] },
   },
   { timestamps: true }

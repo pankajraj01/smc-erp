@@ -13,6 +13,13 @@ import PartyDeleteModal from './PartyDeleteModal'
 import PartyTable from './PartyTable'
 import PaginationControls from '../../../components/PaginationControls'
 import Icon from '../../../components/Icon'
+import {
+  createParty,
+  deleteParty,
+  getAllParties,
+  getPartyById,
+  updateParty,
+} from '../../../api/masters/party'
 
 const ITEMS_PER_PAGE = 5
 
@@ -30,9 +37,8 @@ export default function PartyMaster() {
   // function to Fetch parties
   const fetchParties = async (goToLastPage = false) => {
     try {
-      const res = await fetch('http://localhost:5000/api/master/parties')
-      const data = await res.json()
-      const allParties = data.parties || []
+      const res = await getAllParties()
+      const allParties = res.data.parties || []
 
       setParties(allParties)
 
@@ -61,19 +67,7 @@ export default function PartyMaster() {
   const handleSaveParty = async (party) => {
     try {
       const isEdit = !!party._id
-      const url = isEdit
-        ? `http://localhost:5000/api/master/parties/${party._id}`
-        : 'http://localhost:5000/api/master/parties'
-      const method = isEdit ? 'PATCH' : 'POST'
-
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(party),
-      })
-
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Save failed')
+      const res = isEdit ? await updateParty(party._id, party) : await createParty(party)
 
       await fetchParties(!isEdit) // ✅ refetch full data ⬅ true means go to last page on add
       setVisible(false) // ✅ close modal
@@ -86,11 +80,9 @@ export default function PartyMaster() {
   // Delete party
   const handleDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/master/parties/${partyToDelete._id}`, {
-        method: 'DELETE',
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Delete failed')
+      const res = await deleteParty(partyToDelete._id)
+      // const data = await res.data
+      // if (!res.ok) throw new Error(data.message || 'Delete failed')
 
       const updated = parties.filter((p) => p._id !== partyToDelete._id)
       setParties(updated)
@@ -107,10 +99,6 @@ export default function PartyMaster() {
     const term = searchTerm.toLowerCase()
     const matchesType = typeFilter === 'ALL' || party.type === typeFilter
     const matchesSearch = party.partyName.toLowerCase().includes(term)
-    // party.type.toLowerCase().includes(term) ||
-    // party.bank?.bankName?.toLowerCase().includes(term) ||
-    // party.bank?.ifsc?.toLowerCase().includes(term)
-
     return matchesType && matchesSearch
   })
 

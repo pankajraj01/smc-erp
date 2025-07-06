@@ -13,6 +13,7 @@ import DeleteItemModal from './DeleteItemModal'
 import ItemTable from './ItemTable'
 import PaginationControls from '../../../components/PaginationControls'
 import Icon from '../../../components/Icon'
+import { createItem, deleteItem, getAllItems, updateItem } from '../../../api/masters/item'
 
 const ITEMS_PER_PAGE = 5
 
@@ -27,45 +28,39 @@ export default function ItemMaster() {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
 
+  const fetchItems = async (goToLastPage = false) => {
+    try {
+      const res = await getAllItems()
+      const allItems = res.data.items || []
+      setItems(allItems)
+      // Set pagination based on context
+      if (goToLastPage) {
+        setCurrentPage(Math.ceil(allItems.length / ITEMS_PER_PAGE))
+      } else {
+        setCurrentPage(1)
+      }
+
+      // Optionally reset filters/search here too
+      setTypeFilter('ALL')
+      setSearchTerm('')
+      setLoading(false)
+    } catch (err) {
+      console.error('Failed to fetch Items:', err)
+    }
+  }
+
   // 🚀 Fetch items on mount
   useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/master/items')
-        const data = await res.json()
-        setItems(data.items || [])
-      } catch (err) {
-        console.error('Failed to fetch items:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchItems()
   }, [])
 
   // ✅ Save or update item
   const handleSaveItem = async (item) => {
     try {
-      const url = item._id
-        ? `http://localhost:5000/api/master/items/${item._id}`
-        : 'http://localhost:5000/api/master/items'
-      const method = item._id ? 'PATCH' : 'POST'
+      const isEdit = !!item._id
+      const res = isEdit ? await updateItem(item._id, item) : await createItem(item)
 
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(item),
-      })
-
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Save failed')
-
-      const updatedItems = item._id
-        ? items.map((i) => (i._id === item._id ? data.item : i))
-        : [...items, data.item]
-
-      setItems(updatedItems)
-      setCurrentPage(Math.ceil(updatedItems.length / ITEMS_PER_PAGE))
+      await fetchItems(!isEdit) // ✅ refetch full data ⬅ true means go to last page on add
       setVisible(false)
       setItemToEdit(null)
     } catch (err) {
@@ -76,11 +71,9 @@ export default function ItemMaster() {
   // ❌ Delete item
   const handleDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/master/items/${itemToDelete._id}`, {
-        method: 'DELETE',
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Delete failed')
+      const res = await deleteItem(itemToDelete._id)
+      // const data = await res.json()
+      // if (!res.ok) throw new Error(data.message || 'Delete failed')
 
       const updated = items.filter((i) => i._id !== itemToDelete._id)
       setItems(updated)

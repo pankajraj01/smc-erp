@@ -37,7 +37,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Grey Orders',
-    to: '/api/grey-orders',
+    to: '/grey-orders',
     icon: <CIcon icon={cilNotes} customClassName="nav-icon" />,
   },
   {
@@ -69,28 +69,28 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Item Master',
-    to: '/api/master/items',
+    to: '/master/item',
     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
   },
 
   {
     component: CNavItem,
     name: 'Party Master',
-    to: '/api/master/parties',
+    to: '/master/party',
     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
   },
 
   {
     component: CNavItem,
     name: 'Agent Master',
-    to: '/api/master/agents',
+    to: '/master/agent',
     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
   },
 
   {
     component: CNavItem,
     name: 'Mill Master',
-    to: '/api/master/mills',
+    to: '/master/mill',
     icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
   },
 

@@ -3,6 +3,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
+const { PORT, API_VERSION, MONGO_URI } = require("./config");
+
 // 🛣️ Import Routes
 const authRoutes = require("./routes/auth/auth.routes");
 const usersRoutes = require("./routes/master/user.routes");
@@ -16,16 +18,16 @@ const greyOrderRoutes = require("./routes/grey/grey-order.routes");
 
 const neftRequestRoutes = require("./routes/neft/neft-request.routes");
 
+const pdfTestRoutes = require("./routes/neft/pdfTest.routes");
+
 // ⚙️ Import Services
 const HttpError = require("./utils/httpError");
 
 const app = express();
 app.use(bodyParser.json());
 
-// Middleware to handle CORS and set headers
-// This middleware will allow cross-origin requests and set necessary headers
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   res.setHeader(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
@@ -34,33 +36,37 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Methods",
     "GET, POST, PATCH, DELETE, PUT, OPTIONS"
   );
+  res.setHeader("Access-Control-Allow-Credentials", "true"); // ✅ Add this line!
 
-  // ✅ Handle preflight request
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
   }
 
   next();
 });
+
 // Middleware to parse JSON bodies
 
 // Auth Routes
-app.use("/api/auth", authRoutes);
+app.use(`${API_VERSION}/auth`, authRoutes);
 
 // User Routes
-app.use("/api/users", usersRoutes);
+app.use(`${API_VERSION}/master/user`, usersRoutes);
 
 // Master Routes
-app.use("/api/master/items", itemRoutes);
-app.use("/api/master/agents", agentsRotes);
-app.use("/api/master/party", partyRoutes);
-app.use("/api/master/mills", millRoutes);
+app.use(`${API_VERSION}/master/item`, itemRoutes);
+app.use(`${API_VERSION}/master/agent`, agentsRotes);
+app.use(`${API_VERSION}/master/party`, partyRoutes);
+app.use(`${API_VERSION}/master/mill`, millRoutes);
 
 // Grey Order Routes
-app.use("/api/grey-orders", greyOrderRoutes);
+app.use(`${API_VERSION}/grey-orders`, greyOrderRoutes);
 
 // NEFT Routes
-app.use("/api/neft-request", neftRequestRoutes);
+app.use(`${API_VERSION}/nefts`, neftRequestRoutes);
+
+// PDF Test Route
+app.use(`${API_VERSION}/nefts`, pdfTestRoutes);
 
 // Fallback for undefined routes
 app.use((req, res, next) => {
@@ -79,12 +85,13 @@ app.use((error, req, res, next) => {
 });
 
 mongoose
-  .connect(
-    "mongodb+srv://pankaj:pankaj123@cluster0.mvdxo8u.mongodb.net/smc?retryWrites=true&w=majority&appName=Cluster0"
-  )
+  .connect(MONGO_URI)
   .then(() => {
-    app.listen(5000);
+    console.log("✅ MongoDB connected");
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
   })
   .catch((err) => {
-    console.log(err);
+    console.error("❌ MongoDB connection error:", err.message);
   });

@@ -114,7 +114,7 @@ const updatedParty = async (req, res, next) => {
     if (type) party.type = type;
     if (bank) {
       if (bank.bankName) party.bank.bankName = bank.bankName;
-      if (bank.accountNo) party.bank.accountNo = bank.accountNo;
+      if (bank.accNo) party.bank.accNo = bank.accNo;
       if (bank.ifsc) party.bank.ifsc = bank.ifsc;
     }
 
