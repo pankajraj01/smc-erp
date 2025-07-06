@@ -15,6 +15,7 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
+import { loginUser } from '../../../api/auth.api'
 
 const Login = () => {
   const [userName, setUserName] = useState('')
@@ -23,15 +24,12 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userName, password }),
-      })
+      const res = await loginUser(userName, password)
+      console.log(res)
 
-      const data = await response.json()
+      const data = await res.data
 
-      if (!response.ok) throw new Error(data.message || 'Login failed')
+      // if (!response.ok) throw new Error(data.message || 'Login failed')
 
       localStorage.setItem('isLoggedIn', 'true')
       localStorage.setItem('token', data.token)
