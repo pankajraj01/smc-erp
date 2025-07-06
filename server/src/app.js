@@ -27,8 +27,6 @@ const HttpError = require("./utils/httpError");
 const app = express();
 app.use(bodyParser.json());
 
-const cors = require("cors");
-
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:3000",

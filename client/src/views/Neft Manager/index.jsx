@@ -55,9 +55,6 @@ export default function CreateNeftPage() {
     try {
       const res = await getAllParties()
       setParties(res.data.parties || [])
-      // console.log(res.data.parties)
-
-      // return res.data.parties || []
     } catch (error) {
       console.error('Failed to fetch parties:', error)
       return []
