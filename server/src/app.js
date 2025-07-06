@@ -83,6 +83,7 @@ app.use((error, req, res, next) => {
   res.status(error.code || 500);
   res.json({ message: error.message || "An Unknown error occurred!" });
 });
+console.log('MONGO_URI:', process.env.MONGO_URI)
 
 mongoose
   .connect(MONGO_URI)
