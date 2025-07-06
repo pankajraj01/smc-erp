@@ -20,6 +20,7 @@ import {
   createNeft,
   getNefts,
 } from '../../api/nefts.api'
+import { getAllParties } from '../../api/masters/party'
 
 export default function CreateNeftPage() {
   const location = useLocation()
@@ -50,8 +51,21 @@ export default function CreateNeftPage() {
   const [tdsTotal, setTdsTotal] = useState(0)
   const [partyRemark, setPartyRemark] = useState('')
 
+  const fetchAllParties = async () => {
+    try {
+      const res = await getAllParties()
+      setParties(res.data.parties || [])
+      // console.log(res.data.parties)
+
+      // return res.data.parties || []
+    } catch (error) {
+      console.error('Failed to fetch parties:', error)
+      return []
+    }
+  }
+
   useEffect(() => {
-    fetchAllParties().then((data) => setParties(data || []))
+    fetchAllParties()
   }, [])
 
   useEffect(() => {
