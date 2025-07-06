@@ -1,8 +1,6 @@
-// File: /api/neftApi.js
-
 import axios from 'axios'
 
-const BASE_URL = 'http://localhost:5000/api/neft-request'
+const BASE_URL = 'http://localhost:5000/api/nefts'
 
 // 🔹 Fetch all NEFTs
 export const fetchAllNefts = async () => {

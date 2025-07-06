@@ -11,12 +11,13 @@ import {
 import formatDate from '../../utils/formatDate'
 import { useNavigate } from 'react-router-dom'
 import { FileSignature, FileText } from 'lucide-react'
+import { updateNeftStatus } from '../../api/nefts.api'
 
 export default function NeftTable({ nefts, refreshNefts }) {
   const navigate = useNavigate()
   const statusCycle = ['Pending', 'Paid', 'Partial', 'Cancelled']
   const handleViewPdf = (neftId) => {
-    const url = `http://localhost:5000/api/neft/pdf/${neftId}`
+    const url = `http://localhost:5000/nefts/${neftId}/pdf`
     window.open(url, '_blank')
   }
 
@@ -24,18 +25,7 @@ export default function NeftTable({ nefts, refreshNefts }) {
     const nextStatus = statusCycle[(statusCycle.indexOf(currentStatus) + 1) % statusCycle.length]
 
     try {
-      const res = await fetch(`http://localhost:5000/api/neft-request/${neftId}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: nextStatus }),
-      })
-
-      if (!res.ok) {
-        throw new Error('Failed to update status')
-      }
-
+      await updateNeftStatus(neftId, nextStatus)
       refreshNefts?.()
     } catch (err) {
       console.error('❌ Status update error:', err)
@@ -62,7 +52,7 @@ export default function NeftTable({ nefts, refreshNefts }) {
               <CButton
                 color="secondary"
                 variant="outline"
-                onClick={() => navigate(`/api/neft-manager/${neft._id}`)}
+                onClick={() => navigate(`/neft-manager/${neft._id}`)}
               >
                 {neft.neftNo}
               </CButton>

@@ -5,6 +5,7 @@ import MillDeleteModal from './MillDeleteModal'
 import MillTable from './MillTable'
 import PaginationControls from '../../../components/PaginationControls'
 import Icon from '../../../components/Icon'
+import { createMill, deleteMill, getAllMills, updateMill } from '../../../api/masters/mill'
 
 const ITEMS_PER_PAGE = 5
 
@@ -18,20 +19,30 @@ export default function MillMaster() {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false)
   const [millToDelete, setMillToDelete] = useState(null)
 
+  const fetchMills = async (goToLastPage = false) => {
+    try {
+      const res = await getAllMills()
+
+      const allMills = res.data.mills || []
+      setMills(allMills)
+      // Set pagination based on context
+      if (goToLastPage) {
+        setCurrentPage(Math.ceil(allMills.length / ITEMS_PER_PAGE))
+      } else {
+        setCurrentPage(1)
+      }
+
+      // Optionally reset filters/search here too
+      // setTypeFilter('ALL')
+      setSearchTerm('')
+      setLoading(false)
+    } catch (err) {
+      console.error('Failed to fetch Items:', err)
+    }
+  }
+
   // Fetch mills from API
   useEffect(() => {
-    const fetchMills = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/master/mill')
-        const data = await res.json()
-        setMills(data.mills || [])
-      } catch (err) {
-        console.error('Failed to fetch mills:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchMills()
   }, [])
 
@@ -39,29 +50,9 @@ export default function MillMaster() {
   const handleSaveMill = async (mill) => {
     try {
       const isEdit = !!mill._id
-      const url = isEdit
-        ? `http://localhost:5000/api/master/mill/${mill._id}`
-        : 'http://localhost:5000/api/master/mill'
-      const method = isEdit ? 'PATCH' : 'POST'
+      const res = isEdit ? await updateMill(mill._id, mill) : await createMill(mill)
 
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(mill),
-      })
-
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Save failed')
-
-      const updatedList = isEdit
-        ? mills.map((m) => (m._id === mill._id ? data.mill : m))
-        : [...mills, data.mill]
-
-      setMills(updatedList)
-      if (!isEdit) {
-        setCurrentPage(Math.ceil(updatedList.length / ITEMS_PER_PAGE))
-      }
-
+      await fetchMills(!isEdit) // ✅ refetch full data ⬅ true means go to last page on add
       setVisible(false)
       setMillToEdit(null)
     } catch (err) {
@@ -72,11 +63,7 @@ export default function MillMaster() {
   // Delete mill
   const handleDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/master/mill/${millToDelete._id}`, {
-        method: 'DELETE',
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Delete failed')
+      const res = await deleteMill(millToDelete._id)
 
       const updated = mills.filter((m) => m._id !== millToDelete._id)
       setMills(updated)

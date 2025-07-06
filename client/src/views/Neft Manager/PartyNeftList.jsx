@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import {
   CCard,
   CCardHeader,
@@ -14,19 +14,22 @@ import {
   CButton,
 } from '@coreui/react'
 import formatDate from '../../utils/formatDate'
+import { getNeftByPartyId } from '../../api/nefts.api'
 
 export default function PartyNeftList() {
   const { partyId } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [partyNefts, setPartyNefts] = useState([])
+  const partyName = location.state?.partyName || 'Unknown Party'
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchPartyNefts = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/neft-request/party/${partyId}`)
-        const data = await res.json()
+        const res = await getNeftByPartyId(partyId)
+        const data = await res.data
         setPartyNefts(data.partyNefts || [])
       } catch (err) {
         console.error('Failed to fetch party NEFTs', err)
@@ -41,7 +44,7 @@ export default function PartyNeftList() {
   return (
     <CCard className="shadow-sm">
       <CCardHeader className="bg-info text-white">
-        <h5 className="mb-0">📄 NEFTs for Selected Party</h5>
+        <h5 className="mb-0">📄 NEFTs of {partyName}</h5>
       </CCardHeader>
       <CCardBody>
         {loading ? (
@@ -87,7 +90,7 @@ export default function PartyNeftList() {
                       size="sm"
                       color="dark"
                       onClick={() =>
-                        navigate(`/api/neft-manager/create/${neft.neftId}/party/${partyId}`)
+                        navigate(`/neft-manager/create/${neft.neftId}/party/${partyId}`)
                       }
                     >
                       View

@@ -6,8 +6,11 @@ router.post("/create", neftRequestController.createNeftRequest); // Create a new
 router.get("/", neftRequestController.getAllNeftRequests); // Get all NEFT requests
 router.get("/:id", neftRequestController.getSingleNeftRequest); // Get single NEFT request by ID
 router.post("/:neftId/add-party", neftRequestController.addPartyToNeft); // Add party to NEFT request
-router.put("/:neftId/party/:partyId", neftRequestController.updatePartyInNeft); // Update party in NEFT request
-router.patch("/:neftId/remark", neftRequestController.updateNeftRemark); // Update Neft Remark
+router.patch(
+  "/:neftId/party/:partyId",
+  neftRequestController.updatePartyInNeft
+); // Update party in NEFT request
+router.patch("/:neftId/neftRemark", neftRequestController.updateNeftRemark); // Update Neft Remark
 
 // Delete party from NEFT request
 router.delete(

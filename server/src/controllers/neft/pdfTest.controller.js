@@ -192,7 +192,7 @@ exports.generatePartyPdf = async (req, res) => {
             },
           ],
           ...(partyId
-            ? [] // 🚫 Don't show remark when party PDF
+            ? [] // 🚫 Don't show Neft remark when party PDF
             : [
                 [
                   {

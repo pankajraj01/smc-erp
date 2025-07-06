@@ -4,14 +4,22 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import {
   fetchAllParties,
-  fetchAllNefts,
-  fetchNeftById,
-  createNewNeft,
-  addPartyToNeft,
-  updatePartyInNeft,
+  // fetchAllNefts,
+  // fetchNeftById,
+  // createNewNeft,
+  // addPartyToNeft,
+  // updatePartyInNeft,
 } from './neftApi'
 import NeftForm from './NeftForm'
 import ConfirmationModal from './ConfirmationModal'
+
+import {
+  getNeftById,
+  updatePartyNeft,
+  addPartyToNeft,
+  createNeft,
+  getNefts,
+} from '../../api/nefts.api'
 
 export default function CreateNeftPage() {
   const location = useLocation()
@@ -49,19 +57,24 @@ export default function CreateNeftPage() {
   useEffect(() => {
     const initNeftData = async () => {
       if (isNewNeft) {
-        const data = await fetchAllNefts()
+        const res = await getNefts()
+        const data = res.data.nefts || []
         const lastNeftNo =
           data.length > 0 ? Math.max(...data.map((n) => parseInt(n.neftNo) || 0)) : 0
         setNeftNo(lastNeftNo + 1)
       } else {
-        const neft = await fetchNeftById(neftId)
+        const res = await getNeftById(neftId)
+        const neft = res.data.neft
         setNeftNo(neft.neftNo)
         setNeftDate(neft.neftDate)
         setNeftRemark(neft.neftRemark)
         setNeftStatus(neft.neftStatus)
 
         if (isEditParty) {
-          const neft = await fetchNeftById(neftId)
+          const res = await getNeftById(neftId)
+          const neft = res.data.neft
+          // console.log('neft:', res.data.neft)
+
           // console.log('entered edit party')
           // console.log('neftId: ', neftId)
           // console.log('partyId: ', partyId)
@@ -121,19 +134,21 @@ export default function CreateNeftPage() {
       parties: [partyPayload], // single party wrapped
     }
 
+    console.log(isNewNeft, isAddParty, isEditParty)
+
     try {
       if (isNewNeft) {
-        const response = await createNewNeft(neftPayload)
-        navigate(`/api/neft-manager/${response.neft._id}`)
+        const response = await createNeft(neftPayload)
+        console.log(response.data.neft._id)
+        navigate(`/neft-manager/${response.data.neft._id}`)
       } else if (isAddParty) {
-        await addPartyToNeft(neftId, partyPayload)
-        navigate(`/api/neft-manager/${neftId}`)
+        const res = await addPartyToNeft(neftId, partyPayload)
+        navigate(`/neft-manager/${res.data.neft._id}`)
       } else if (isEditParty) {
         console.log('entered edit party')
-
         console.log('partyPayload', neftPayload)
-        await updatePartyInNeft(neftId, partyId, neftPayload)
-        navigate(`/api/neft-manager/${neftId}`)
+        const res = await updatePartyNeft(neftId, partyId, neftPayload)
+        navigate(`/neft-manager/${res.data.neft._id}`)
       }
     } catch (error) {
       console.error('Save failed:', error)

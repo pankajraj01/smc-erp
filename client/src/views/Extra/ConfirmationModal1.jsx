@@ -29,7 +29,7 @@ export default function ConfirmationModal({
   billRows,
   totalPartyNeftAmount,
   tdsTotal,
-  remark,
+  neftRemark,
 }) {
   const navigate = useNavigate()
 
@@ -40,7 +40,7 @@ export default function ConfirmationModal({
       neftAmount: totalPartyNeftAmount,
       tdsTotal,
       neftStatus: 'Pending',
-      remark,
+      neftRemark,
       parties: [
         {
           partyId: formData.partyId, // ✅ now real ID from DB
@@ -55,7 +55,7 @@ export default function ConfirmationModal({
             billDate: new Date(bill.billDate),
           })),
           totalPartyNeftAmount,
-          remark,
+          neftRemark,
           partyStatus: 'Pending',
         },
       ],
@@ -219,7 +219,7 @@ export default function ConfirmationModal({
             <CRow>
               <CCol md={8}>
                 <h6 className="text-muted">Remark:</h6>
-                <p className="border p-3 bg-light rounded">{remark}</p>
+                <p className="border p-3 bg-light rounded">{neftRemark}</p>
               </CCol>
               <CCol>
                 <CCard className="bg-light p-3">

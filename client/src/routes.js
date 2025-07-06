@@ -36,34 +36,34 @@ const routes = [
   { path: '/login', name: 'Login', element: Login },
 
   // Grey Manager
-  { path: '/api/grey-orders', name: 'Grey Orders', element: GreyOrders },
+  { path: '/grey-orders', name: 'Grey Orders', element: GreyOrders },
   { path: '/grey-received', name: 'Grey Received', element: GreyReceived },
 
   // Master
-  { path: '/api/master/item', name: 'Item Master', element: ItemMaster },
-  { path: '/api/master/party', name: 'Party Master', element: PartyMaster },
-  { path: '/api/master/mill', name: 'Mill Master', element: MillMaster },
-  { path: '/api/master/agent', name: 'Agent Master', element: AgentMaster },
+  { path: '/master/item', name: 'Item Master', element: ItemMaster },
+  { path: '/master/party', name: 'Party Master', element: PartyMaster },
+  { path: '/master/mill', name: 'Mill Master', element: MillMaster },
+  { path: '/master/agent', name: 'Agent Master', element: AgentMaster },
 
   // Neft Manager
-  { path: '/api/neft-manager', name: 'Neft Manager', element: NeftManager },
-  { path: '/api/neft-manager/create', name: 'Create New Neft', element: CreateNewNeft }, // add new
-  { path: '/api/neft-manager/create/:neftId', name: 'Create New Neft', element: CreateNewNeft }, // add party to neft
+  { path: '/neft-manager', name: 'Neft Manager', element: NeftManager },
+  { path: '/neft-manager/create', name: 'Create New Neft', element: CreateNewNeft }, // add new
+  { path: '/neft-manager/add-party/:neftId', name: 'Add Party', element: CreateNewNeft }, // add party to neft
   {
-    path: '/api/neft-manager/create/:neftId/party/:partyId',
+    path: '/neft-manager/create/:neftId/party/:partyId',
     name: 'Create New Neft',
     element: CreateNewNeft,
   }, // edit/update data
 
-  { path: '/api/neft-manager/:neftId', name: 'Neft Page', element: NeftPage }, // view single neft
+  { path: '/neft-manager/:neftId', name: 'View Neft', element: NeftPage }, // view single neft
 
   {
-    path: '/api/neft-manager/neft-party-center',
+    path: '/neft-manager/neft-party-center',
     name: 'Neft Party Center',
     element: NeftPartyCenter,
   }, // view party wise neft
   {
-    path: '/api/neft-manager/neft-party/:partyId',
+    path: '/neft-manager/neft-party/:partyId',
     name: 'Neft Party Center',
     element: PartyNeftList,
   },

@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PaginationControls from '../../components/PaginationControls'
+import { getNefts } from '../../api/nefts.api'
 
 export default function NeftPartyCenter() {
   const [nefts, setNefts] = useState([])
@@ -38,9 +39,8 @@ export default function NeftPartyCenter() {
   useEffect(() => {
     const fetchNefts = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/neft-request')
-        const data = await res.json()
-
+        const res = await getNefts()
+        const data = await res.data
         const map = {}
 
         data.nefts.forEach((neft) => {
@@ -113,7 +113,11 @@ export default function NeftPartyCenter() {
                   <CButton
                     color="primary"
                     size="sm"
-                    onClick={() => navigate(`/api/neft-manager/neft-party/${party.partyId}`)}
+                    onClick={() =>
+                      navigate(`/neft-manager/neft-party/${party.partyId}`, {
+                        state: { partyName: party.partyName }, // ✅ passing name here
+                      })
+                    }
                   >
                     View All NEFTs
                   </CButton>

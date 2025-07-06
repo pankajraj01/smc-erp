@@ -16,14 +16,21 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-import CIcon from '@coreui/icons-react'
-import { cilPencil, cilTrash } from '@coreui/icons'
+
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import PaginationControls from '../../components/PaginationControls'
 import formatDate from '../../utils/formatDate'
 import ConfirmDeleteModal from './ConfirmDeleteModal'
 import { FileSignature, FileText, FileTextIcon, PencilIcon, Trash2Icon } from 'lucide-react'
+
+import {
+  deletePartyNeft,
+  getNeftById,
+  updateNeftRemark,
+  updateNeftStatus,
+  updatePartyStatus,
+} from '../../api/nefts.api'
 
 export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
   const ITEMS_PER_PAGE = 5
@@ -42,7 +49,7 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
   const statusCycle = ['Pending', 'Paid', 'Partial', 'Cancelled']
 
   const handleDownloadPartyPdf = (neftId, partyId) => {
-    const url = `http://localhost:5000/api/neft/pdf/${neftId}/party/${partyId}`
+    const url = `http://localhost:5000/api/nefts/${neftId}/party/${partyId}/pdf`
     window.open(url, '_blank')
   }
 
@@ -51,9 +58,8 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
 
     const fetchNeft = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/neft-request/${neftId}`)
-        const data = await res.json()
-
+        const res = await getNeftById(neftId)
+        const data = res.data || []
         setNeftDetails(data?.neft || null)
         setPartyList(data?.neft?.parties || [])
       } catch (err) {
@@ -66,22 +72,13 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
 
   const handleSaveRemark = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/neft-request/${neftId}/remark`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ remark: remarkInput }),
-      })
+      await updateNeftRemark(neftId, remarkInput)
 
-      const data = await res.json()
-      if (res.ok) {
-        setNeftDetails((prev) => ({ ...prev, neftRemark: remarkInput }))
-        setEditMode(false)
-      } else {
-        alert(data.message || 'Failed to update remark')
-      }
+      setNeftDetails((prev) => ({ ...prev, neftRemark: remarkInput }))
+      setEditMode(false)
     } catch (err) {
-      console.error('Error updating remark:', err)
-      alert('Error updating remark')
+      console.error('Error updating neftRemark:', err)
+      alert('Error updating neftRemark')
     }
   }
 
@@ -90,17 +87,8 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
     const nextStatus = statusCycle[(statusCycle.indexOf(currentStatus) + 1) % statusCycle.length]
 
     try {
-      const res = await fetch(`http://localhost:5000/api/neft-request/${neftId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: nextStatus }),
-      })
-      const data = await res.json()
-      if (res.ok) {
-        setNeftDetails((prev) => ({ ...prev, neftStatus: nextStatus }))
-      } else {
-        alert(data.message)
-      }
+      await updateNeftStatus(neftId, nextStatus)
+      setNeftDetails((prev) => ({ ...prev, neftStatus: nextStatus }))
     } catch (err) {
       console.error('Failed to update status', err)
     }
@@ -112,23 +100,11 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
     const next = statusCycle[(statusCycle.indexOf(current) + 1) % statusCycle.length]
 
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/neft-request/${neftId}/party/${partyId}/status`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: next }),
-        },
+      await updatePartyStatus(neftId, partyId, next)
+      const updated = partyList.map((p) =>
+        p._id === partyId ? { ...p, partyNeftStatus: next } : p,
       )
-      const data = await res.json()
-      if (res.ok) {
-        const updated = partyList.map((p) =>
-          p._id === partyId ? { ...p, partyNeftStatus: next } : p,
-        )
-        setPartyList(updated)
-      } else {
-        alert(data.message)
-      }
+      setPartyList(updated)
     } catch (err) {
       console.error('Party status update failed', err)
     }
@@ -208,7 +184,7 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
                       value={remarkInput}
                       onChange={(e) => setRemarkInput(e.target.value)}
                       className="me-2"
-                      placeholder="Enter NEFT remark"
+                      placeholder="Enter NEFT neftRemark"
                     />
                     <CButton color="success" size="sm" onClick={handleSaveRemark}>
                       Save
@@ -220,7 +196,7 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
                 ) : (
                   <div className="d-flex align-items-center justify-content-between">
                     <h6 className="fw-semibold mb-0 text-dark">
-                      {neftDetails.neftRemark || 'No remark added'}
+                      {neftDetails.neftRemark || 'No Neft Remark added'}
                     </h6>
                     <CButton
                       color="secondary"
@@ -268,7 +244,7 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
               <option value="Partial">Partial</option>
               <option value="Cancelled">Cancelled</option>
             </CFormSelect>
-            <CButton color="primary" onClick={() => navigate(`/api/neft-manager/create/${neftId}`)}>
+            <CButton color="primary" onClick={() => navigate(`/neft-manager/add-party/${neftId}`)}>
               + Add More Party
             </CButton>
           </CCol>
@@ -334,7 +310,7 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
                     color="light"
                     className="border border-info text-info"
                     onClick={() =>
-                      navigate(`/api/neft-manager/create/${neftId}/party/${party.partyId}`)
+                      navigate(`/neft-manager/create/${neftId}/party/${party.partyId}`)
                     }
                   >
                     <PencilIcon size={16} />
@@ -365,24 +341,12 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
             partyName={partyToDelete?.partyName}
             onConfirm={async () => {
               try {
-                const res = await fetch(
-                  `http://localhost:5000/api/neft-request/${neftId}/party/${partyToDelete._id}`,
-                  {
-                    method: 'DELETE',
-                  },
-                )
-                const data = await res.json()
-
-                if (res.ok) {
-                  // 🔁 Refresh NEFT details
-                  const refetch = await fetch(`http://localhost:5000/api/neft-request/${neftId}`)
-                  const updated = await refetch.json()
-                  setNeftDetails(updated.neft)
-                  setPartyList(updated.neft.parties)
-                  setDeleteModalVisible(false)
-                } else {
-                  alert(data.message || 'Delete failed')
-                }
+                await deletePartyNeft(neftId, partyToDelete._id)
+                // 🔁 Refresh NEFT details
+                const refetch = await getNeftById(neftId)
+                setNeftDetails(refetch.data.neft)
+                setPartyList(refetch.data.neft.parties)
+                setDeleteModalVisible(false)
               } catch (err) {
                 console.error('Delete error:', err)
                 alert('Error while deleting party')

@@ -102,7 +102,7 @@ export default function CreateNewNeft() {
   ])
   const [totalPartyNeftAmount, setTotalPartyNeftAmount] = useState(0)
   const [tdsTotal, setTdsTotal] = useState(0)
-  const [remark, setRemark] = useState(initialParty?.remark || '')
+  const [neftRemark, setNeftRemark] = useState(initialParty?.neftRemark || '')
   const options = parties.map((p) => ({
     value: p._id, // 👈 use _id as value
     label: p.partyName,
@@ -455,9 +455,9 @@ export default function CreateNewNeft() {
             <CCol md={8}>
               <CFormTextarea
                 rows={3}
-                value={remark}
+                value={neftRemark}
                 placeholder="📝 Add any remarks here..."
-                onChange={(e) => setRemark(e.target.value)}
+                onChange={(e) => setNeftRemark(e.target.value)}
               />
             </CCol>
             <CCol>
@@ -501,7 +501,7 @@ export default function CreateNewNeft() {
           billRows={billRows}
           totalPartyNeftAmount={totalPartyNeftAmount}
           tdsTotal={tdsTotal}
-          remark={remark}
+          neftRemark={neftRemark}
         />
       )}
     </>

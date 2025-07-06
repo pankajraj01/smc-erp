@@ -66,18 +66,20 @@ const getSingleNeftRequest = async (req, res, next) => {
 // Update Neft Remark
 const updateNeftRemark = async (req, res) => {
   try {
-    const { remark } = req.body;
+    const { neftRemark } = req.body;
+    console.log(req.body);
+
     const { neftId } = req.params;
 
     const neft = await NeftRequest.findById(neftId);
     if (!neft) return res.status(404).json({ message: "NEFT not found" });
 
-    neft.neftRemark = remark || "";
+    neft.neftRemark = neftRemark || "";
     await neft.save();
 
     res.status(200).json({ message: "NEFT remark updated", neft });
   } catch (err) {
-    console.error("Remark update error:", err);
+    console.error("Neft Remark update error:", err);
     res.status(500).json({ message: "Failed to update NEFT remark" });
   }
 };

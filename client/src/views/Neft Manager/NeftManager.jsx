@@ -15,6 +15,8 @@ import { FileSignature } from 'lucide-react'
 import NeftTable from './NeftTable'
 import PaginationControls from '../../components/PaginationControls'
 
+import { getNefts } from '../../api/nefts.api'
+
 const ITEMS_PER_PAGE = 5
 
 export default function NeftManager() {
@@ -30,9 +32,9 @@ export default function NeftManager() {
 
   const fetchNefts = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/neft-request')
-      const data = await res.json()
-      setNefts(data.nefts || [])
+      const res = await getNefts()
+      // const data = await res.json()
+      setNefts(res.data.nefts || [])
       setLoading(false)
     } catch (error) {
       console.error('Failed to fetch NEFTs:', error)
@@ -101,7 +103,7 @@ export default function NeftManager() {
               color="light"
               size="sm"
               className="border border-info"
-              onClick={() => navigate('/api/neft-manager/neft-party-center')}
+              onClick={() => navigate('/neft-manager/neft-party-center')}
             >
               Party Wise Nefts
             </CButton>
@@ -110,7 +112,7 @@ export default function NeftManager() {
               color="success"
               size="sm"
               className="border border-info ms-2"
-              onClick={() => navigate('/api/neft-manager/create')}
+              onClick={() => navigate('/neft-manager/create')}
             >
               <FileSignature size={16} className="me-2" />
               <span>Create New Neft</span>

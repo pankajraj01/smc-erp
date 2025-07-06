@@ -15,6 +15,7 @@ import AgentFormModal from './AgentFormModal'
 import AgentTable from './AgentTable'
 import AgentDeleteModal from './AgentDeleteModal'
 import PaginationControls from '../../../components/PaginationControls'
+import { createAgent, deleteAgent, getAllAgents, updateAgent } from '../../../api/masters/agent'
 
 const ITEMS_PER_PAGE = 5
 
@@ -33,8 +34,10 @@ export default function AgentMaster() {
   // ✅ Fetch agents once on component mount
   const fetchAgents = async (goToLastPage = false) => {
     try {
-      const res = await fetch('http://localhost:5000/api/master/agent')
-      const data = await res.json()
+      const res = await getAllAgents()
+      console.log(res)
+
+      const data = await res.data
       const allAgents = data.agents || []
 
       setAgents(allAgents)
@@ -59,24 +62,7 @@ export default function AgentMaster() {
   const handleSaveAgent = async (agent) => {
     try {
       const isEdit = !!agent._id
-
-      const url = agent._id
-        ? `http://localhost:5000/api/master/agent/${agent._id}`
-        : 'http://localhost:5000/api/master/agent'
-      const method = agent._id ? 'PATCH' : 'POST'
-
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(agent),
-      })
-
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Operation failed')
-
-      const updatedAgents = agent._id
-        ? agents.map((a) => (a._id === agent._id ? data.agent : a))
-        : [...agents, data.agents]
+      const res = isEdit ? await updateAgent(agent._id, agent) : await createAgent(agent)
 
       await fetchAgents(!isEdit) // ✅ refetch full data ⬅ true means go to last page on add
       setVisible(false) // ✅ close modal
@@ -89,11 +75,9 @@ export default function AgentMaster() {
   // ✅ Handle delete confirmation
   const handleDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/master/agent/${agentToDelete._id}`, {
-        method: 'DELETE',
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Delete failed')
+      const res = await deleteAgent(agentToDelete._id)
+      // const data = await res.data
+      // if (!res.ok) throw new Error(data.message || 'Delete failed')
 
       const updated = agents.filter((a) => a._id !== agentToDelete._id)
       setAgents(updated)
