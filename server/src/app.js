@@ -2,6 +2,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 const { PORT, API_VERSION, MONGO_URI } = require("./config");
 
@@ -26,24 +27,33 @@ const HttpError = require("./utils/httpError");
 const app = express();
 app.use(bodyParser.json());
 
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PATCH, DELETE, PUT, OPTIONS"
-  );
-  res.setHeader("Access-Control-Allow-Credentials", "true"); // ✅ Add this line!
+const cors = require("cors");
 
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    credentials: true,
+  })
+);
 
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+//   res.setHeader(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+//   );
+//   res.setHeader(
+//     "Access-Control-Allow-Methods",
+//     "GET, POST, PATCH, DELETE, PUT, OPTIONS"
+//   );
+//   res.setHeader("Access-Control-Allow-Credentials", "true"); // ✅ Add this line!
+
+//   if (req.method === "OPTIONS") {
+//     return res.sendStatus(200);
+//   }
+
+//   next();
+// });
 
 // Middleware to parse JSON bodies
 
@@ -83,7 +93,7 @@ app.use((error, req, res, next) => {
   res.status(error.code || 500);
   res.json({ message: error.message || "An Unknown error occurred!" });
 });
-console.log('MONGO_URI:', process.env.MONGO_URI)
+console.log("MONGO_URI:", process.env.MONGO_URI);
 
 mongoose
   .connect(MONGO_URI)
