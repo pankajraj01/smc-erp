@@ -27,6 +27,8 @@ import { FileSignature, FileText, FileTextIcon, PencilIcon, Trash2Icon } from 'l
 import {
   deletePartyNeft,
   getNeftById,
+  getNeftPdf,
+  getPartyNeftPdf,
   updateNeftRemark,
   updateNeftStatus,
   updatePartyStatus,
@@ -48,9 +50,22 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
 
   const statusCycle = ['Pending', 'Paid', 'Partial', 'Cancelled']
 
-  const handleDownloadPartyPdf = (neftId, partyId) => {
-    const url = `http://localhost:5000/api/nefts/${neftId}/party/${partyId}/pdf`
-    window.open(url, '_blank')
+  // getNeftPdf(neftId)
+  // getPartyNeftPdf(neftId, partyId)
+
+  const handleDownloadPartyPdf = async (neftId, partyId) => {
+    try {
+      const response = await getPartyNeftPdf(neftId, partyId)
+      console.log(response)
+
+      const fileBlob = new Blob([response.data], { type: 'application/pdf' })
+      const fileURL = URL.createObjectURL(fileBlob)
+
+      window.open(fileURL, '_blank')
+    } catch (error) {
+      console.error('Failed to download party NEFT PDF:', error)
+      alert('Error downloading PDF')
+    }
   }
 
   useEffect(() => {

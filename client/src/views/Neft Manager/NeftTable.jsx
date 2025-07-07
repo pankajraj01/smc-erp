@@ -11,13 +11,13 @@ import {
 import formatDate from '../../utils/formatDate'
 import { useNavigate } from 'react-router-dom'
 import { FileSignature, FileText } from 'lucide-react'
-import { updateNeftStatus } from '../../api/nefts.api'
+import { getNeftPdf, updateNeftStatus } from '../../api/nefts.api'
 
 export default function NeftTable({ nefts, refreshNefts }) {
   const navigate = useNavigate()
   const statusCycle = ['Pending', 'Paid', 'Partial', 'Cancelled']
   const handleViewPdf = (neftId) => {
-    const url = `http://localhost:5000/nefts/${neftId}/pdf`
+    const url = getNeftPdf(neftId)
     window.open(url, '_blank')
   }
 
