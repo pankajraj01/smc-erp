@@ -17,17 +17,22 @@ export default function NeftTable({ nefts, refreshNefts }) {
   const navigate = useNavigate()
   const statusCycle = ['Pending', 'Partial', 'Paid', 'Cancelled']
 
-  const handleViewNeftPdf = async (neftId) => {
-    try {
-      const response = await getNeftPdf(neftId) // returns blob
-      const file = new Blob([response.data], { type: 'application/pdf' })
-      const fileURL = URL.createObjectURL(file)
-      window.open(fileURL, '_blank') // View in new tab
-    } catch (err) {
-      console.error('PDF View Error:', err)
-      alert('Failed to open PDF')
-    }
+  const handleViewNeftPdf = (neftId, partyId) => {
+    const url = `https://smc-erp.onrender.com/api/nefts/${neftId}/pdf`
+    window.open(url, '_blank')
   }
+
+  // const handleViewNeftPdf = async (neftId) => {
+  //   try {
+  //     const response = await getNeftPdf(neftId) // returns blob
+  //     const file = new Blob([response.data], { type: 'application/pdf' })
+  //     const fileURL = URL.createObjectURL(file)
+  //     window.open(fileURL, '_blank') // View in new tab
+  //   } catch (err) {
+  //     console.error('PDF View Error:', err)
+  //     alert('Failed to open PDF')
+  //   }
+  // }
 
   const handleNeftStatusToggle = async (neftId, currentStatus) => {
     const nextStatus = statusCycle[(statusCycle.indexOf(currentStatus) + 1) % statusCycle.length]

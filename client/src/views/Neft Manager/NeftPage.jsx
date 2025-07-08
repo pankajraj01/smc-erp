@@ -53,21 +53,9 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
   // getNeftPdf(neftId)
   // getPartyNeftPdf(neftId, partyId)
 
-  const handleViewPartyPdf = async (neftId, partyId) => {
-    try {
-      const response = await getPartyNeftPdf(neftId, partyId)
-
-      const blob = new Blob([response.data], { type: 'application/pdf' })
-      const blobURL = URL.createObjectURL(blob)
-
-      // ✅ Open in new tab only — NO forced download
-      window.open(blobURL, '_blank')
-
-      // ✅ Do NOT use download() or click() here
-    } catch (error) {
-      console.error('Error viewing PDF:', error)
-      alert('Failed to open Party NEFT PDF')
-    }
+  const handleViewPartyPdf = (neftId, partyId) => {
+    const url = `https://smc-erp.onrender.com/api/nefts/${neftId}/parties/${partyId}/pdf`
+    window.open(url, '_blank')
   }
 
   // const handleViewPartyPdf = async (neftId, partyId) => {
