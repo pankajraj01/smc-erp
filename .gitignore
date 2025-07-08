@@ -11,13 +11,14 @@ yarn-error.log*
 # Environment variables (for both frontend and backend)
 .env
 .env.*.local
-
+.env.production
 # ===========================
 # Client (React)
 # ===========================
 /client/node_modules
 /client/build
 /client/.env
+/client/.env.production
 /client/.env.*.local
 /client/package-lock.json
 /client/yarn.lock
@@ -27,6 +28,7 @@ yarn-error.log*
 # ===========================
 /server/node_modules
 /server/.env
+/server/.env.production
 /server/.env.*.local
 /server/package-lock.json
 /server/yarn.lock
