@@ -22,4 +22,4 @@ export const getNeftByPartyId = (partyId) => API.get(`/nefts/party/${partyId}`)
 // PDF APIs
 export const getNeftPdf = (id) => API.get(`/nefts/${id}/pdf`, { responseType: 'blob' })
 export const getPartyNeftPdf = (neftId, partyId) =>
-  API.get(`/nefts/${neftId}/parties/${partyId}/pdf`, { responseType: 'blob' })
+  API.get(`/nefts/${neftId}/party/${partyId}/pdf`, { responseType: 'blob' })

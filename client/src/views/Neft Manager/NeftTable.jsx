@@ -15,10 +15,18 @@ import { getNeftPdf, updateNeftStatus } from '../../api/nefts.api'
 
 export default function NeftTable({ nefts, refreshNefts }) {
   const navigate = useNavigate()
-  const statusCycle = ['Pending', 'Paid', 'Partial', 'Cancelled']
-  const handleViewPdf = (neftId) => {
-    const url = getNeftPdf(neftId)
-    window.open(url, '_blank')
+  const statusCycle = ['Pending', 'Partial', 'Paid', 'Cancelled']
+
+  const handleViewNeftPdf = async (neftId) => {
+    try {
+      const response = await getNeftPdf(neftId) // returns blob
+      const file = new Blob([response.data], { type: 'application/pdf' })
+      const fileURL = URL.createObjectURL(file)
+      window.open(fileURL, '_blank') // View in new tab
+    } catch (err) {
+      console.error('PDF View Error:', err)
+      alert('Failed to open PDF')
+    }
   }
 
   const handleNeftStatusToggle = async (neftId, currentStatus) => {
@@ -46,54 +54,62 @@ export default function NeftTable({ nefts, refreshNefts }) {
         </CTableRow>
       </CTableHead>
       <CTableBody>
-        {nefts.map((neft) => (
-          <CTableRow key={neft.neftNo}>
-            <CTableDataCell>
-              <CButton
-                color="secondary"
-                variant="outline"
-                onClick={() => navigate(`/neft-manager/${neft._id}`)}
-              >
-                {neft.neftNo}
-              </CButton>
-            </CTableDataCell>
-            <CTableDataCell>{formatDate(neft.neftDate)}</CTableDataCell>
-            <CTableDataCell>{neft.parties?.length}</CTableDataCell>
-            <CTableDataCell>
-              ₹ {neft.neftAmount ? neft.neftAmount.toLocaleString() : '0'}
-            </CTableDataCell>
-            <CTableDataCell>
-              <CBadge
-                color={
-                  neft.neftStatus === 'Paid'
-                    ? 'success'
-                    : neft.neftStatus === 'Partial'
-                      ? 'info'
-                      : neft.neftStatus === 'Cancelled'
-                        ? 'secondary'
-                        : 'warning'
-                }
-                className="px-3 py-1 cursor-pointer"
-                onClick={() => handleNeftStatusToggle(neft._id, neft.neftStatus)}
-                title="Click to change NEFT status"
-              >
-                {neft.neftStatus}
-              </CBadge>
-            </CTableDataCell>
-            <CTableDataCell className="">
-              <CButton
-                size="sm"
-                color="light"
-                className="border border-info text-info"
-                onClick={() => handleViewPdf(neft._id)}
-                title="Download NEFT PDF"
-              >
-                <FileText size={16} />
-                {/* <span className="fw-medium ms-1">PDF</span> */}
-              </CButton>
+        {nefts.length > 0 ? (
+          nefts.map((neft) => (
+            <CTableRow key={neft.neftNo}>
+              <CTableDataCell>
+                <CButton
+                  color="secondary"
+                  variant="outline"
+                  onClick={() => navigate(`/neft-manager/${neft._id}`)}
+                >
+                  {neft.neftNo}
+                </CButton>
+              </CTableDataCell>
+              <CTableDataCell>{formatDate(neft.neftDate)}</CTableDataCell>
+              <CTableDataCell>{neft.parties?.length}</CTableDataCell>
+              <CTableDataCell>
+                ₹ {neft.neftAmount ? neft.neftAmount.toLocaleString() : '0'}
+              </CTableDataCell>
+              <CTableDataCell>
+                <CBadge
+                  color={
+                    neft.neftStatus === 'Paid'
+                      ? 'success'
+                      : neft.neftStatus === 'Partial'
+                        ? 'info'
+                        : neft.neftStatus === 'Cancelled'
+                          ? 'secondary'
+                          : 'warning'
+                  }
+                  className="px-3 py-1 cursor-pointer"
+                  onClick={() => handleNeftStatusToggle(neft._id, neft.neftStatus)}
+                  title="Click to change NEFT status"
+                >
+                  {neft.neftStatus}
+                </CBadge>
+              </CTableDataCell>
+              <CTableDataCell className="">
+                <CButton
+                  size="sm"
+                  color="light"
+                  className="border border-info text-info"
+                  onClick={() => handleViewNeftPdf(neft._id)}
+                  title="Download NEFT PDF"
+                >
+                  <FileText size={16} />
+                  {/* <span className="fw-medium ms-1">PDF</span> */}
+                </CButton>
+              </CTableDataCell>
+            </CTableRow>
+          ))
+        ) : (
+          <CTableRow>
+            <CTableDataCell colSpan={6} className="text-center text-muted">
+              No Nefts found.
             </CTableDataCell>
           </CTableRow>
-        ))}
+        )}
       </CTableBody>
     </CTable>
   )

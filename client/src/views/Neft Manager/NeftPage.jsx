@@ -53,20 +53,34 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
   // getNeftPdf(neftId)
   // getPartyNeftPdf(neftId, partyId)
 
-  const handleDownloadPartyPdf = async (neftId, partyId) => {
+  const handleViewPartyPdf = async (neftId, partyId) => {
     try {
       const response = await getPartyNeftPdf(neftId, partyId)
-      console.log(response)
 
-      const fileBlob = new Blob([response.data], { type: 'application/pdf' })
-      const fileURL = URL.createObjectURL(fileBlob)
+      const blob = new Blob([response.data], { type: 'application/pdf' })
+      const blobURL = URL.createObjectURL(blob)
 
-      window.open(fileURL, '_blank')
+      // ✅ Open in new tab only — NO forced download
+      window.open(blobURL, '_blank')
+
+      // ✅ Do NOT use download() or click() here
     } catch (error) {
-      console.error('Failed to download party NEFT PDF:', error)
-      alert('Error downloading PDF')
+      console.error('Error viewing PDF:', error)
+      alert('Failed to open Party NEFT PDF')
     }
   }
+
+  // const handleViewPartyPdf = async (neftId, partyId) => {
+  //   try {
+  //     const response = await getPartyNeftPdf(neftId, partyId)
+  //     const file = new Blob([response.data], { type: 'application/pdf' })
+  //     const fileURL = URL.createObjectURL(file)
+  //     window.open(fileURL, '_blank') // ✅ Open PDF in new browser tab
+  //   } catch (error) {
+  //     console.error('Error viewing Party NEFT PDF:', error)
+  //     alert('Failed to open Party NEFT PDF')
+  //   }
+  // }
 
   useEffect(() => {
     if (!neftId) return
@@ -309,7 +323,7 @@ export default function NeftPage({ isVisible, setIsVisible, selectedNeft }) {
                     color="light"
                     className="border border-info text-info"
                     onClick={() =>
-                      handleDownloadPartyPdf(
+                      handleViewPartyPdf(
                         neftId,
                         typeof party.partyId === 'object' ? party.partyId._id : party.partyId,
                       )
