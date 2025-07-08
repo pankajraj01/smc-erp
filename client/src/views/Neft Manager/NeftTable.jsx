@@ -17,9 +17,26 @@ export default function NeftTable({ nefts, refreshNefts }) {
   const navigate = useNavigate()
   const statusCycle = ['Pending', 'Partial', 'Paid', 'Cancelled']
 
-  const handleViewNeftPdf = (neftId, partyId) => {
-    const url = `https://smc-erp.onrender.com/api/nefts/${neftId}/pdf`
-    window.open(url, '_blank')
+  // const handleViewNeftPdf = (neftId, partyId) => {
+  //   const url = `https://smc-erp.onrender.com/api/nefts/${neftId}/parties/${partyId}/pdf`
+  //   window.open(url, '_blank')
+  // }
+
+  const handleViewNeftPdf = async (neftId, partyId) => {
+    try {
+      const response = await getNeftPdf(neftId)
+
+      const blob = new Blob([response.data], { type: 'application/pdf' })
+      const blobURL = URL.createObjectURL(blob)
+
+      // ✅ Open in new tab only — NO forced download
+      window.open(blobURL, '_blank')
+
+      // ✅ Do NOT use download() or click() here
+    } catch (error) {
+      console.error('Error viewing PDF:', error)
+      alert('Failed to open Party NEFT PDF')
+    }
   }
 
   // const handleViewNeftPdf = async (neftId) => {
